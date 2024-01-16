@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     @Autowired
     AdminService adminService;
-    public ResponseEntity<String> approveUserAccess(@RequestParam Long id, Role role) {
-        return adminService.approveUserAccess(id, role);
+    public ResponseEntity<String> approveUserAccess(@RequestBody UserRole userRole) {
+        return adminService.approveUserAccess(userRole);
     }
 }

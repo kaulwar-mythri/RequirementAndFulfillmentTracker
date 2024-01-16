@@ -15,13 +15,14 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     UserRoleRepository userRoleRepository;
     @Override
-    public ResponseEntity<String> approveUserAccess(Long id, Role role) {
-        Optional<UserRole> existingUserRole = userRoleRepository.findById(id);
+    public ResponseEntity<String> approveUserAccess(UserRole userRole) {
+        Optional<UserRole> existingUserRole = userRoleRepository.findByEmailId(userRole.getEmailId());
 
         if (existingUserRole.isPresent()) {
-            UserRole userRole = existingUserRole.get();
-            userRole.setRole(role);
-            userRoleRepository.save(userRole);
+            UserRole user = existingUserRole.get();
+            user.setRole(userRole.getRole());
+            user.setAccounts(userRole.getAccounts());
+            userRoleRepository.save(user);
 
             return ResponseEntity.ok("User Role Saved");
         } else {

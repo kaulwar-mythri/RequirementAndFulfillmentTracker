@@ -24,6 +24,8 @@ public class UserRole implements UserDetails{
     @GeneratedValue(strategy = GenerationType.AUTO)
     long id;
 
+    long employeeId;
+
     @Enumerated(EnumType.STRING)
     Role role;
 
@@ -40,6 +42,14 @@ public class UserRole implements UserDetails{
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(long employeeId) {
+        this.employeeId = employeeId;
     }
 
     public Role getRole() {
@@ -70,6 +80,7 @@ public class UserRole implements UserDetails{
     public String toString() {
         return "UserRole{" +
                 "id=" + id +
+                ", employeeId=" + employeeId +
                 ", role=" + role +
                 ", accounts=" + accounts +
                 ", emailId='" + emailId + '\'' +

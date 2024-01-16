@@ -23,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     UserRoleRepository userRoleRepository;
     private String validationEndpoint = "https://www.googleapis.com/oauth2/v3/tokeninfo";
+    private boolean isNewUser = false;
     @Override
     public ResponseEntity<Map<String, Object>> createUserRole(String googleAuthToken) {
         try {
@@ -32,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
                 Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("status", "success");
                 responseMap.put("authToken", tokenPayload);
+                responseMap.put("isNewuser", isNewUser);
 
                 return ResponseEntity.ok(responseMap);
             } else {
@@ -68,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
                         .accounts(new HashSet<>())
                         .build();
                 jwtToken = jwtService.generateJWTToken(userRoleRepository.save(newUserRole));
+                isNewUser = true;
             } else {
                 jwtToken = jwtService.generateJWTToken(userRole);
             }
@@ -79,5 +82,16 @@ public class AuthServiceImpl implements AuthService {
             return jwtToken;
         else
             return null;
+    }
+
+    @Override
+    public ResponseEntity<UserRole> getUser(String googleAuthToken) {
+        String email = jwtService.extractUsernameFromJWTToken(googleAuthToken);
+        UserRole user = userRoleRepository.findByEmailId(email).orElse(null);
+        if(user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 }
