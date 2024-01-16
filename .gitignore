@@ -7,8 +7,7 @@ build/
 !**/src/test/**/build/
 
 # Gradle
-build.gradle
-**/src/main/resources/application.properties
+src/main/resources/application.properties
 
 
 ### STS ###
