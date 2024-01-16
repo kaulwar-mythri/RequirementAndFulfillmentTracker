@@ -16,9 +16,11 @@ repositories {
 }
 
 dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.mysql:mysql-connector-j:8.2.0'
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+	implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.4.1.Final', ext: 'pom'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
