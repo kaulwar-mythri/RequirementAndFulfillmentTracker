@@ -31,6 +31,7 @@ public class Account {
         @JoinTable(
 
         )
+    @Builder.Default
     Set<UserRole> userRoles = new HashSet<>();
 
     public long getId() {
