@@ -30,4 +30,60 @@ public class Requirement {
             referencedColumnName = "account_id"
     )
     private Account account;
+
+    public Long getRequirementId() {
+        return requirementId;
+    }
+
+    public void setRequirementId(Long requirementId) {
+        this.requirementId = requirementId;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public Long getRequiredNo() {
+        return requiredNo;
+    }
+
+    public void setRequiredNo(Long requiredNo) {
+        this.requiredNo = requiredNo;
+    }
+
+    public String getJob_description() {
+        return job_description;
+    }
+
+    public void setJob_description(String job_description) {
+        this.job_description = job_description;
+    }
+
+    public String getHiring_manager() {
+        return hiring_manager;
+    }
+
+    public void setHiring_manager(String hiring_manager) {
+        this.hiring_manager = hiring_manager;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
 }

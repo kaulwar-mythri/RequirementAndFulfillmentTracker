@@ -7,7 +7,10 @@ build/
 
 # Gradle
 src/main/resources/application.properties
+# Ignore application.properties
 application.properties
+
+# Ignore build.gradle
 build.gradle
 
 ### STS ###
