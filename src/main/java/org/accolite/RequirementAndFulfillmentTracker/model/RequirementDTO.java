@@ -8,5 +8,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequirementDTO {
-
+    long requirementID;
+    String startDate;
+    String endDate;
+    long requiredNo;
+    String jobDescription;
+    String hiringManager;
+    AccountDTO account;
 }
