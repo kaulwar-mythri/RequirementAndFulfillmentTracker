@@ -33,7 +33,11 @@ public class BenchCandidate {
 
     private int benchPeriod;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c6ceeb0950c8d87d4078e215512a7beafa4ef9c4
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "benchManagerID", referencedColumnName = "id")
     private UserRole benchManager;
@@ -105,6 +109,7 @@ public class BenchCandidate {
     public BenchCandidate(){
 
     }
+<<<<<<< HEAD
 =======
 
     // shouldn't this be mapped to userrole ??
@@ -112,6 +117,8 @@ public class BenchCandidate {
     // replaced benchManagerId with Userrole attribute
     private UserRole benchManager;
 >>>>>>> alisimran
+=======
+>>>>>>> c6ceeb0950c8d87d4078e215512a7beafa4ef9c4
 
 
 //    public void addSubmission(Submission submission) {
