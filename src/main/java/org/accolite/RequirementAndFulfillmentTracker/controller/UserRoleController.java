@@ -1,6 +1,7 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class UserRoleController {
     }
 
     @PostMapping("/requestAccess")
-    public ResponseEntity<String> requestAccess(@RequestBody UserRole userRole) {
-        return userRoleService.requestAccess(userRole);
+    public ResponseEntity<String> requestAccess(@RequestBody UserRoleDTO userRoleDTO) {
+        return userRoleService.requestAccess(userRoleDTO);
     }
 }

@@ -1,6 +1,8 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 
+import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.AuthService;
 import org.accolite.RequirementAndFulfillmentTracker.service.UserRoleService;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,8 +23,9 @@ public class AuthController {
         return authService.createUserRole(googleAuthToken);
     }
 
-    @GetMapping("/getUser")
-    public ResponseEntity<UserRole> getUser(@RequestBody String googleAuthToken) {
+    @GetMapping("/getUser/{googleAuthToken}")
+    public ResponseEntity<UserRoleDTO> getUser(@PathVariable String googleAuthToken) {
+
         return authService.getUser(googleAuthToken);
     }
 }

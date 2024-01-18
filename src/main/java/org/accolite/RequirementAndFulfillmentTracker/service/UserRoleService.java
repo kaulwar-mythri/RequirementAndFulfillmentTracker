@@ -1,6 +1,7 @@
 package org.accolite.RequirementAndFulfillmentTracker.service;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface UserRoleService {
     public UserRole updateUser(long id, UserRole updatedUserRole);
     public ResponseEntity<String> deleteUserById(long id);
 
-    public ResponseEntity<String> requestAccess(UserRole userRole);
+    public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO);
 }

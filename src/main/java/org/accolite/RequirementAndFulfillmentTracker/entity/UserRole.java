@@ -1,10 +1,8 @@
 package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,13 +25,13 @@ public class UserRole implements UserDetails{
 
     long employeeId;
 
+
     @Enumerated(EnumType.STRING)
     Role role;
 
-    @ManyToMany(targetEntity = Account.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "users_accounts", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "account_id", referencedColumnName = "account_id"))
-    Set<Account> accounts = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "users_accounts", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "account_id"))
+    Set<Account> accounts = new HashSet<Account>();
 
     String emailId;
 
@@ -74,17 +73,6 @@ public class UserRole implements UserDetails{
 
     public void setEmailId(String emailId) {
         this.emailId = emailId;
-    }
-
-    @Override
-    public String toString() {
-        return "UserRole{" +
-                "id=" + id +
-                ", employeeId=" + employeeId +
-                ", role=" + role +
-                ", accounts=" + accounts +
-                ", emailId='" + emailId + '\'' +
-                '}';
     }
 
     @Override
