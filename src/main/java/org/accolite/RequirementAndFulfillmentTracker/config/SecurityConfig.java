@@ -28,11 +28,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         System.out.println("filter chain");
         http
-                .cors(cors -> cors.disable())
+//                .cors(cors -> cors.disable())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/auth/**", "/api/vendor/auth/*", "/api/admin/*", "/api/requirement/**")
-
+                    req.requestMatchers("/api/auth/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

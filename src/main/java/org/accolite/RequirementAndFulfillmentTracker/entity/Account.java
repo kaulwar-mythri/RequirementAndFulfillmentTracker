@@ -2,16 +2,16 @@ package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
+import org.apache.catalina.User;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,17 +21,11 @@ public class Account {
     long account_id;
     String name;
     long parentId;
+
     @Enumerated(EnumType.STRING)
     HierarchyTag hierarchyTag;
 
-//    @ManyToMany(mappedBy = "accounts", targetEntity = UserRole.class)
-    @ManyToMany(
-            cascade =  CascadeType.ALL
-    )
-        @JoinTable(
-
-        )
-    @Builder.Default
+    @ManyToMany(mappedBy = "accounts", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     Set<UserRole> userRoles = new HashSet<>();
 
     public long getId() {
@@ -72,16 +66,5 @@ public class Account {
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "id=" + account_id +
-                ", name='" + name + '\'' +
-                ", parentId=" + parentId +
-                ", hierarchyTag=" + hierarchyTag +
-                ", userRoles=" + userRoles +
-                '}';
     }
 }

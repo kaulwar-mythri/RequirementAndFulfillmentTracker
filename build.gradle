@@ -30,11 +30,7 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.3'
 	implementation 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
-
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-	// added java mail sender dependency
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+  implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

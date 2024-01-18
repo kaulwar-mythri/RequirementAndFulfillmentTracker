@@ -2,6 +2,7 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public ResponseEntity<String> requestAccess(UserRole userRole) {
+    public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO) {
         //send alert to admin
 
         return ResponseEntity.ok("Requested Access");
