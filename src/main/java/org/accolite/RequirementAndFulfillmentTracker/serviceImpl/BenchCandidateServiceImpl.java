@@ -2,6 +2,8 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import jakarta.transaction.Transactional;
+import org.accolite.RequirementAndFulfillmentTracker.entity.CandidateStatus;
 import org.accolite.RequirementAndFulfillmentTracker.repository.BenchCandidateRepository;
 import org.accolite.RequirementAndFulfillmentTracker.entity.BenchCandidate;
 import org.accolite.RequirementAndFulfillmentTracker.service.BenchCandidateService;
@@ -18,7 +20,14 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     private BenchCandidateRepository benchCandidateRepository;
     @Override
     public BenchCandidate addCandidate(BenchCandidate candidate) {
-        return benchCandidateRepository.save(candidate);
+        BenchCandidate newCandidate = BenchCandidate.builder()
+                .candidateName(candidate.getCandidateName())
+                .skill(candidate.getSkill())
+                .benchManager(candidate.getBenchManager())
+                .benchPeriod(candidate.getBenchPeriod())
+                .status(candidate.getStatus())
+                .build();
+        return benchCandidateRepository.save(newCandidate);
     }
 
     @Override
@@ -32,22 +41,33 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     }
 
     @Override
+    @Transactional
     public BenchCandidate updateCandidate(Long id, BenchCandidate updatedCandidate) {
         // Find the existing BenchCandidate by ID
         Optional<BenchCandidate> optionalExistingCandidate = benchCandidateRepository.findById(id);
-
+        System.out.println(optionalExistingCandidate);
         if (optionalExistingCandidate.isPresent()) {
-            BenchCandidate existingCandidate = optionalExistingCandidate.get();
 
+            BenchCandidate existingCandidate = optionalExistingCandidate.get();
+            System.out.println(optionalExistingCandidate);
+            System.out.println("Current candidate details = " + existingCandidate);
             // Update the fields based on the provided data in updatedCandidate
+
+            BenchCandidate candidate = BenchCandidate.builder()
+                    .candidateName(existingCandidate.getCandidateName())
+                    .skill(existingCandidate.getSkill())
+                    .benchManager(existingCandidate.getBenchManager())
+                    .benchPeriod(existingCandidate.getBenchPeriod())
+                    .status(existingCandidate.getStatus())
+                    .build();
             existingCandidate.setStatus(updatedCandidate.getStatus());
             existingCandidate.setSkill(updatedCandidate.getSkill());
             existingCandidate.setBenchPeriod(updatedCandidate.getBenchPeriod());
             existingCandidate.setBenchManager(updatedCandidate.getBenchManager());
 
-
-
-            // Save the updated BenchCandidatexz
+//            existingCandidate.setBenchManager(updatedCandidate.getBenchManager());
+            System.out.println("Updated candidate details" + existingCandidate);
+            // Save the updated BenchCandidate
             return benchCandidateRepository.save(existingCandidate);
         } else {
             // Handling the case when the candidate with the given ID is not found

@@ -2,8 +2,13 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
+import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Requirement;
+import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.RequirementRepository;
+import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.EmailNotificationService;
 import org.accolite.RequirementAndFulfillmentTracker.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +30,37 @@ public class RequirementServiceImpl implements RequirementService {
     private JavaMailSender javaMailSender;
     @Autowired
     private EmailNotificationService emailNotificationService;
+    @Autowired
+    private AccountRepository accountRepository;
 
+    @Autowired
+    private UserRoleRepository userRoleRepository;
     @Override
     public Requirement createRequirement(Requirement requirement) {
-        return requirementsRepository.save(requirement);
+        System.out.println(requirement);
+
+
+//        Account account = requirement.getAccount();
+//        Set<UserRole> userRoles = account.getUserRoles();
+//        System.out.printf("userroles " + userRoles);
+//        Account newAccount = Account.builder()
+//                .name(account.getName())
+//                .hierarchyTag(account.getHierarchyTag())
+//                .parentId(account.getParentId())
+//                .userRoles(account.getUserRoles())
+//                .build();
+//        Account account = accountRepository.findById()
+//        System.out.println(accountRepository.save(newAccount));
+        Account account = accountRepository.findById(requirement.getAccount().getAccount_id()).orElse(null);
+        Requirement newRequirement = Requirement.builder()
+                .startDate(requirement.getStartDate())
+                .endDate(requirement.getEndDate())
+                .requiredNo(requirement.getRequiredNo())
+                .job_description(requirement.getJob_description())
+                .hiring_manager(requirement.getHiring_manager())
+                .account(account)
+                .build();
+        return requirementsRepository.save(newRequirement);
     }
 
     @Override
@@ -61,15 +93,33 @@ public class RequirementServiceImpl implements RequirementService {
                 .orElseThrow(() -> new IllegalArgumentException("Requirement not found with id: " + id));
     }
 
+
     @Override
     public void deleteRequirement(Long id) {
+        // retrieve the existing requirment
+        Requirement existingRequirement = requirementsRepository.findById(id).orElse(null);
+        // Get the account
+        if(existingRequirement == null){
+            System.out.println("Requirement doesn't exits ");
+            return;
+        }
+        existingRequirement.setAccount(null);
         requirementsRepository.deleteById(id);
     }
 
     @Override
     public void alertBench(Long benchManagerId, Set<Long> requirementIds) throws MessagingException {
         List<Requirement> requirements = requirementsRepository.findAllById(requirementIds);
+        // using the given id , get the benchmanger's email id and pass it through
 
+//        UserRole benchManager = userRoleRepository.findById(benchManagerId).orElse(null);
+//        if(benchManager == null) {
+//            System.out.println("bench manager doesn't exist");
+//            return;
+//        }
+//        String benchManagerEmail =benchManager.getEmailId();
+        // we will have to set username and apppassword of the respective benchmanager in application.properties
+        // this needs to be implemented, tested and reviewed
         if (!requirements.isEmpty()) {
             String tableContent = generateRequirementTable(requirements);
             emailNotificationService.sendNotification("raftspringto@gmail.com", "Requirements Obtained", tableContent);
