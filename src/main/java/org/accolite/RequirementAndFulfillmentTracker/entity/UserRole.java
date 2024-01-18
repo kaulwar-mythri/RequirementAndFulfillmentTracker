@@ -30,7 +30,6 @@ public class UserRole implements UserDetails{
     @ManyToMany(targetEntity = Account.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "users_accounts", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "account_id", referencedColumnName = "account_id"))
-    @Builder.Default
     Set<Account> accounts = new HashSet<>();
 
     String emailId;

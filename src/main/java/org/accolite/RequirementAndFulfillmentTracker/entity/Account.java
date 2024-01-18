@@ -24,14 +24,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     HierarchyTag hierarchyTag;
 
-//    @ManyToMany(mappedBy = "accounts", targetEntity = UserRole.class)
-    @ManyToMany(
-            cascade =  CascadeType.ALL
-    )
-        @JoinTable(
-
-        )
-    @Builder.Default
+    @ManyToMany(mappedBy = "accounts", targetEntity = UserRole.class)
     Set<UserRole> userRoles = new HashSet<>();
 
     public long getId() {
