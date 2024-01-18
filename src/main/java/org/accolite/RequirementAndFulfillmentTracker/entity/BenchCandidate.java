@@ -2,6 +2,10 @@
 package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +14,10 @@ import java.util.Set;
 @Entity
 
 @Table(name = "bench_candidates")
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BenchCandidate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +32,7 @@ public class BenchCandidate {
     private Set<Skill> skill = new HashSet<>();
 
     private int benchPeriod;
+<<<<<<< HEAD
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "benchManagerID", referencedColumnName = "id")
@@ -96,6 +105,13 @@ public class BenchCandidate {
     public BenchCandidate(){
 
     }
+=======
+
+    // shouldn't this be mapped to userrole ??
+    @OneToOne(mappedBy = "userrole")
+    // replaced benchManagerId with Userrole attribute
+    private UserRole benchManager;
+>>>>>>> alisimran
 
 
 //    public void addSubmission(Submission submission) {
