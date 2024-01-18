@@ -23,13 +23,26 @@ public class RequirementController {
     @Autowired
     private EmailNotificationService emailNotificationService;
     // Endpoint to create a new requirement
+
+//    @PostMapping("/createWithNewAccount")
+//    public ResponseEntity<Requirement> createRequirementWithNewAccount(@RequestBody Requirement requirement){
+//        System.out.println("requirement received" + requirement);
+//        Requirement newRequirement = requirementService.createRequirementWithNewAccount(requirement);
+//        return new ResponseEntity<>(newRequirement, HttpStatus.CREATED);
+//    }
+
+    // working
     @PostMapping("/create")
     public ResponseEntity<Requirement> createRequirement(@RequestBody Requirement requirement) {
+        System.out.println("requirement received" + requirement);
         Requirement createdRequirement = requirementService.createRequirement(requirement);
+
         return new ResponseEntity<>(createdRequirement, HttpStatus.CREATED);
     }
 
     // Endpoint to update an existing requirement by ID
+
+    // working
     @PutMapping("/{id}/update")
     public ResponseEntity<Requirement> updateRequirement(@PathVariable Long id, @RequestBody Requirement requirement) {
         Requirement updatedRequirement = requirementService.updateRequirement(id, requirement);
@@ -37,6 +50,7 @@ public class RequirementController {
     }
 
     // Endpoint to get a list of all requirements
+    // working
     @GetMapping("/all")
     public ResponseEntity<List<Requirement>> getAllRequirements() {
         List<Requirement> requirements = requirementService.getAllRequirements();
@@ -44,6 +58,7 @@ public class RequirementController {
     }
 
     // Endpoint to get a requirement by ID
+    // working
     @GetMapping("/{id}")
     public ResponseEntity<Requirement> getRequirementById(@PathVariable Long id) {
         Requirement requirement = requirementService.getRequirementById(id);
@@ -51,8 +66,9 @@ public class RequirementController {
     }
 
     // Endpoint to delete a requirement by ID
+    // working
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteRequirement(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRequirement(@PathVariable("id") Long id) {
         requirementService.deleteRequirement(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -72,5 +88,4 @@ public class RequirementController {
     }
 
 }
-
 
