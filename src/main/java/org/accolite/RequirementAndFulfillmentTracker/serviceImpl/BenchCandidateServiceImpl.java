@@ -63,6 +63,7 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
             existingCandidate.setStatus(updatedCandidate.getStatus());
             existingCandidate.setSkill(updatedCandidate.getSkill());
             existingCandidate.setBenchPeriod(updatedCandidate.getBenchPeriod());
+            existingCandidate.setBenchManager(updatedCandidate.getBenchManager());
 
 //            existingCandidate.setBenchManager(updatedCandidate.getBenchManager());
             System.out.println("Updated candidate details" + existingCandidate);

@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BenchCandidate {
@@ -21,7 +23,11 @@ public class BenchCandidate {
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
-    private String skill;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
+    private Set<Skill> skill = new HashSet<>();
+
     private int benchPeriod;
 
     // shouldn't this be mapped to userrole ??
