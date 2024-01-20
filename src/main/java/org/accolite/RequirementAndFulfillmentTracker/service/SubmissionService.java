@@ -1,5 +1,7 @@
 package org.accolite.RequirementAndFulfillmentTracker.service;
  import org.accolite.RequirementAndFulfillmentTracker.entity.Submission;
+ import org.accolite.RequirementAndFulfillmentTracker.model.SubmissionDTO;
+ import org.springframework.http.ResponseEntity;
  import org.springframework.stereotype.Service;
 
  import java.util.List;
@@ -7,13 +9,13 @@ package org.accolite.RequirementAndFulfillmentTracker.service;
 
  @Service
 public interface SubmissionService {
-    Submission createSubmission(Submission submission);
+    ResponseEntity<SubmissionDTO> createSubmission(SubmissionDTO submission);
 
-    List<Submission> getAllSubmissions();
+    ResponseEntity<List<SubmissionDTO>> getAllSubmissions();
 
-    Optional<Submission> getSubmissionById(Long id);
+    ResponseEntity<SubmissionDTO> getSubmissionById(Long id);
 
-    Submission updateSubmission(Long id, Submission updatedSubmission);
+     ResponseEntity<SubmissionDTO> updateSubmission(Long id, SubmissionDTO updatedSubmission);
 
     void deleteSubmission(Long id);
 }

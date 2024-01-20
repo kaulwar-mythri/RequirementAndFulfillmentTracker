@@ -7,8 +7,11 @@ import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleReposito
 import org.accolite.RequirementAndFulfillmentTracker.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +64,13 @@ public class UserRoleServiceImpl implements UserRoleService {
         //send alert to admin
 
         return ResponseEntity.ok("Requested Access");
+    }
+
+    @Override
+    public ResponseEntity<String> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getAuthorities());
+
+        return ResponseEntity.ok(authentication.getName());
     }
 }

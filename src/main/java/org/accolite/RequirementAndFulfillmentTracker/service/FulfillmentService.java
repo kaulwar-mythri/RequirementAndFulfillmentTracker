@@ -1,6 +1,8 @@
 package org.accolite.RequirementAndFulfillmentTracker.service;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.Fulfillment;
+import org.accolite.RequirementAndFulfillmentTracker.model.FulfillmentDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -8,13 +10,13 @@ import java.util.List;
 
 public interface FulfillmentService {
 
-    Fulfillment createFulfillment(Fulfillment fulfillment);
+    ResponseEntity<FulfillmentDTO> createFulfillment(FulfillmentDTO fulfillment);
 
-    List<Fulfillment> getAllFulfillments();
+    ResponseEntity<List<FulfillmentDTO>> getAllFulfillments();
 
-    Fulfillment getFulfillmentById(Long fulfillmentId);
+    ResponseEntity<FulfillmentDTO> getFulfillmentById(Long fulfillmentId);
 
-    Fulfillment updateFulfillment(Long fulfillmentID, Fulfillment updatedFulfillment);
+    ResponseEntity<FulfillmentDTO> updateFulfillment(Long fulfillmentID, FulfillmentDTO updatedFulfillment);
 
     void deleteFulfillment(@PathVariable Long fulfillmentId);
 }

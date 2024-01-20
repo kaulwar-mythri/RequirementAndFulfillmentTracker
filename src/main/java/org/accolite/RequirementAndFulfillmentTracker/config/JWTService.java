@@ -4,6 +4,9 @@ package org.accolite.RequirementAndFulfillmentTracker.config;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,13 @@ public class JWTService {
     }
     public String generateJWTToken(UserDetails userDetails) {
         return generateJWTToken(new HashMap<>(), userDetails);
+    }
+
+    public String getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getName());
+
+        return authentication.getName();
     }
 
     public String generateJWTToken(Map<String, Object> extraClaims, UserDetails userDetails) {

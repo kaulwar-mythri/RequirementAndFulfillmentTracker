@@ -1,5 +1,6 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Submission;
+import org.accolite.RequirementAndFulfillmentTracker.model.SubmissionDTO;
 import org.accolite.RequirementAndFulfillmentTracker.service.SubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,30 +18,29 @@ public class SubmissionsController {
     private SubmissionService submissionsService;
 
     @PostMapping("/create")
-    public  Submission createSubmission(@RequestBody Submission submission) {
+    public ResponseEntity<SubmissionDTO> createSubmission(@RequestBody SubmissionDTO submission) {
 
         return submissionsService.createSubmission(submission);
     }
 
     @GetMapping("/all")
-    public List<Submission> getAllSubmissions(){
+    public ResponseEntity<List<SubmissionDTO>> getAllSubmissions(){
         return submissionsService.getAllSubmissions();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Submission> getSubmissionById(@PathVariable Long id) {
-        Optional<Submission> submission = submissionsService.getSubmissionById(id);
-        return submission.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SubmissionDTO> getSubmissionById(@PathVariable Long id) {
+        return submissionsService.getSubmissionById(id);
     }
 
     @PutMapping("/{id}/update")
-    public Submission updateSubmission(@PathVariable Long id, @RequestBody Submission updatedSubmission) {
+    public SubmissionDTO updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
         return submissionsService.updateSubmission(id, updatedSubmission);
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteSubmission(@PathVariable Long id) {
+    public ResponseEntity<String> deleteSubmission(@PathVariable Long id) {
         submissionsService.deleteSubmission(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Successfully deleted fulfillment");
     }
 }

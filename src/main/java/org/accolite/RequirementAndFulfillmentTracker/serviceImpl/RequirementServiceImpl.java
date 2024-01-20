@@ -3,21 +3,28 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
-import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
-import org.accolite.RequirementAndFulfillmentTracker.entity.Requirement;
-import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
+import org.accolite.RequirementAndFulfillmentTracker.entity.*;
+import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
+import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
+import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
+import org.accolite.RequirementAndFulfillmentTracker.model.RequirementDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.RequirementRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.EmailNotificationService;
 import org.accolite.RequirementAndFulfillmentTracker.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -25,84 +32,76 @@ public class RequirementServiceImpl implements RequirementService {
 
     @Autowired
     private RequirementRepository requirementsRepository;
-
     @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
     private EmailNotificationService emailNotificationService;
     @Autowired
     private AccountRepository accountRepository;
-
     @Autowired
     private UserRoleRepository userRoleRepository;
+    @Autowired
+    private JWTService jwtService;
+    @Autowired
+    private EntityToDTO entityToDTO;
+
+    List<Role> authorised_roles = new ArrayList<>(List.of(Role.REQUIREMENT_MANAGER, Role.ADMIN, Role.SUPER_ADMIN));
     @Override
-    public Requirement createRequirement(Requirement requirement) {
-        System.out.println(requirement);
-
-
-//        Account account = requirement.getAccount();
-//        Set<UserRole> userRoles = account.getUserRoles();
-//        System.out.printf("userroles " + userRoles);
-//        Account newAccount = Account.builder()
-//                .name(account.getName())
-//                .hierarchyTag(account.getHierarchyTag())
-//                .parentId(account.getParentId())
-//                .userRoles(account.getUserRoles())
-//                .build();
-//        Account account = accountRepository.findById()
-//        System.out.println(accountRepository.save(newAccount));
+    public ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement) {
+        checkIfAuthorized(requirement.getAccount());
         Account account = accountRepository.findById(requirement.getAccount().getAccount_id()).orElse(null);
         Requirement newRequirement = Requirement.builder()
                 .startDate(requirement.getStartDate())
                 .endDate(requirement.getEndDate())
                 .requiredNo(requirement.getRequiredNo())
-                .job_description(requirement.getJob_description())
-                .hiring_manager(requirement.getHiring_manager())
+                .job_description(requirement.getJobDescription())
+                .hiring_manager(requirement.getHiringManager())
                 .account(account)
+//                .skillSet(requirement.getSkillSet())
                 .build();
-        return requirementsRepository.save(newRequirement);
+        newRequirement = requirementsRepository.save(newRequirement);
+        return ResponseEntity.ok(entityToDTO.getRequirementDTO(newRequirement));
     }
 
     @Override
-    public Requirement updateRequirement(Long id, Requirement updatedRequirement) {
-        Optional<Requirement> existingRequirement = requirementsRepository.findById(id);
-        if (existingRequirement.isPresent()) {
-            Requirement requirementToUpdate = existingRequirement.get();
-            // Update fields based on your needs
-            requirementToUpdate.setStartDate(updatedRequirement.getStartDate());
-            requirementToUpdate.setEndDate(updatedRequirement.getEndDate());
-            requirementToUpdate.setRequiredNo(updatedRequirement.getRequiredNo());
-//            requirementToUpdate.setSkillSet(updatedRequirement.getSkillSet());
-            requirementToUpdate.setJob_description(updatedRequirement.getJob_description());
-            requirementToUpdate.setHiring_manager(updatedRequirement.getHiring_manager());
+    public ResponseEntity<RequirementDTO> updateRequirement(Long id, RequirementDTO updatedRequirement) {
+        checkIfAuthorized(updatedRequirement.getAccount());
+        Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with given ID not found"));
 
-            return requirementsRepository.save(requirementToUpdate);
-        } else {
-            // Handle case where the requirement with the given id is not found
-            throw new IllegalArgumentException("Requirement not found with id: " + id);
-        }
+        existingRequirement.setStartDate(updatedRequirement.getStartDate());
+        existingRequirement.setEndDate(updatedRequirement.getEndDate());
+        existingRequirement.setRequiredNo(updatedRequirement.getRequiredNo());
+//        existingRequirement.(updatedRequirement.getSkillSet());
+        existingRequirement.setJob_description(updatedRequirement.getJobDescription());
+        existingRequirement.setHiring_manager(updatedRequirement.getHiringManager());
+
+        existingRequirement = requirementsRepository.save(existingRequirement);
+
+        return ResponseEntity.ok(entityToDTO.getRequirementDTO(existingRequirement));
+
     }
     @Override
-    public List<Requirement> getAllRequirements() {
-        return requirementsRepository.findAll();
+    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
+        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
+            return entityToDTO.getRequirementDTO(requirement);
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(requirementDTOS);
     }
 
     @Override
-    public Requirement getRequirementById(Long id) {
-        return requirementsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Requirement not found with id: " + id));
+    public ResponseEntity<RequirementDTO> getRequirementById(Long id) {
+        Requirement requirement = requirementsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requirement not found with id: " + id));
+        return ResponseEntity.ok(entityToDTO.getRequirementDTO(requirement));
     }
 
 
     @Override
     public void deleteRequirement(Long id) {
-        // retrieve the existing requirment
-        Requirement existingRequirement = requirementsRepository.findById(id).orElse(null);
-        // Get the account
-        if(existingRequirement == null){
-            System.out.println("Requirement doesn't exits ");
-            return;
-        }
+        Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
+        RequirementDTO requirementDTO = entityToDTO.getRequirementDTO(existingRequirement);
+        checkIfAuthorized(requirementDTO.getAccount());
+
         existingRequirement.setAccount(null);
         requirementsRepository.deleteById(id);
     }
@@ -192,5 +191,19 @@ public class RequirementServiceImpl implements RequirementService {
     public void alertHiring(Long hiringManagerId, Set<Long> requirementIds) {
         // Implement alertHiring logic based on your requirements
         // You can perform actions like notifying the hiring manager or updating the database
+    }
+
+    //requirement_account is
+    private void checkIfAuthorized(AccountDTO requirement_account) {
+        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+        Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        List<Account> userBUs = user.getAccounts().stream().filter(account -> {
+            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
+        }).collect(Collectors.toList());
+
+        if(!authorised_roles.contains(user.getRole()) || !userBUs.contains(requirementBU)) {
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+        }
     }
 }

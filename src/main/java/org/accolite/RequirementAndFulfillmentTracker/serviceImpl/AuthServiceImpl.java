@@ -1,6 +1,7 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
+import org.accolite.RequirementAndFulfillmentTracker.config.SecurityConfig;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.GoogleTokenPayload;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
@@ -12,6 +13,8 @@ import org.accolite.RequirementAndFulfillmentTracker.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -74,7 +77,6 @@ public class AuthServiceImpl implements AuthService {
                         .role(Role.DEFAULT)
                         .accounts(new HashSet<>())
                         .build();
-
                 jwtToken = jwtService.generateJWTToken(userRoleRepository.save(newUserRole));
                 isNewUser = true;
             } else {
@@ -91,35 +93,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<UserRoleDTO> getUser(String googleAuthToken) {
-        String email = jwtService.extractUsernameFromJWTToken(googleAuthToken);
-        UserRole user = userRoleRepository.findByEmailId(email).orElse(null);
-        System.out.println(user);
-        if(user != null) {
-            Set<Account> accounts = user.getAccounts();
-            Set<AccountDTO> accountDTOS = convertAccountsToDTOs(accounts);
-            UserRoleDTO userRoleDTO = UserRoleDTO.builder()
-                    .id(user.getId())
-                    .emailId(user.getEmailId())
-                    .employeeId(user.getEmployeeId())
-                    .accounts(accountDTOS)
-                    .role(user.getRole())
-                                    .build();
-            return ResponseEntity.ok(userRoleDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-    }
+    public ResponseEntity<String> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getName());
 
-    public Set<AccountDTO> convertAccountsToDTOs(Set<Account> accounts) {
-        return accounts.stream().map(account -> {
-            AccountDTO accountDTO = AccountDTO.builder()
-                    .account_id(account.getAccount_id())
-                    .name(account.getName())
-                    .hierarchyTag(account.getHierarchyTag())
-                    .parentId(account.getParentId())
-                    .build();
-            return accountDTO;
-        }).collect(Collectors.toSet());
+        return ResponseEntity.ok(authentication.getName());
     }
 }
