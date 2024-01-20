@@ -16,4 +16,6 @@ public interface UserRoleService {
     public ResponseEntity<String> deleteUserById(long id);
 
     public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO);
+
+    public ResponseEntity<String> getUser();
 }

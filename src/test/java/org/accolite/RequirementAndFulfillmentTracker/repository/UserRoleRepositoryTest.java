@@ -30,7 +30,7 @@ class UserRoleRepositoryTest {
                 .id(1)
                 .emailId("kaulwar.mythri@accolitedigital.com")
                 .employeeId(7495)
-                .role(Role.BENCH_MANAGER)
+                .role(Role.REQUIREMENT_MANAGER)
                 .build();
 
         userRoleRepository.save(userRole);

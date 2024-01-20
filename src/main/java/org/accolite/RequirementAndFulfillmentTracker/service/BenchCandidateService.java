@@ -1,18 +1,20 @@
 package org.accolite.RequirementAndFulfillmentTracker.service;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.BenchCandidate;
+import org.accolite.RequirementAndFulfillmentTracker.model.BenchCandidateDTO;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BenchCandidateService {
-    BenchCandidate addCandidate(BenchCandidate candidate);
+    ResponseEntity<BenchCandidateDTO> addCandidate(BenchCandidateDTO candidate);
 
-    List<BenchCandidate> getAllCandidates();
+    List<BenchCandidateDTO> getAllCandidates();
 
-    Optional<BenchCandidate> getCandidateById(Long id);
+    ResponseEntity<BenchCandidateDTO> getCandidateById(Long id);
 
-    BenchCandidate updateCandidate(Long id, BenchCandidate updatedCandidate);
+    ResponseEntity<BenchCandidateDTO> updateCandidate(Long id, BenchCandidateDTO updatedCandidate);
 
-    void deleteCandidate(Long id);
+    ResponseEntity<String> deleteCandidate(Long id);
 }

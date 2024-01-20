@@ -1,19 +1,18 @@
 package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
+@Getter
+@Setter
 @Builder
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class BenchCandidate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +25,7 @@ public class BenchCandidate {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
-    private Set<Skill> skill = new HashSet<>();
+    private Set<Skill> skills = new HashSet<>();
 
     private int benchPeriod;
 

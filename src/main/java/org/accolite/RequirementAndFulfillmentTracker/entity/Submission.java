@@ -2,9 +2,15 @@ package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import jakarta.persistence.*;
+import lombok.*;
 
 
 @Entity
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Submission {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +29,6 @@ private SubmissionStatus submissionStatus;
     @ManyToOne( cascade = CascadeType.ALL)
     @JoinColumn(name = "benchCandidateId")
     private BenchCandidate benchCandidate;
-
-
-    public Submission() {
-    }
 
     public Long getSubmissionId() {
         return submissionId;

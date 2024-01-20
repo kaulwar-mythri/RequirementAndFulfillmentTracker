@@ -1,8 +1,14 @@
 package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "fulfillment")
 public class Fulfillment {
     @Id
@@ -10,23 +16,11 @@ public class Fulfillment {
     private Long fulfillmentId;
 
     private String fulfillmentDate;
-    private String fulfillmentStatus;
+    private FulfillmentStatus fulfillmentStatus;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "submission_id")
     private Submission submission;
-
-    // Constructors, getters, and setters
-
-    public Fulfillment(Long fulfillmentId, String fulfillmentDate, String fulfillmentStatus, Submission submission) {
-        this.fulfillmentId = fulfillmentId;
-        this.fulfillmentDate = fulfillmentDate;
-        this.fulfillmentStatus = fulfillmentStatus;
-        this.submission = submission;
-    }
-
-    public Fulfillment() {
-    }
 
     public Long getFulfillmentId() {
         return fulfillmentId;
@@ -36,7 +30,7 @@ public class Fulfillment {
         return fulfillmentDate;
     }
 
-    public String getFulfillmentStatus() {
+    public FulfillmentStatus getFulfillmentStatus() {
         return fulfillmentStatus;
     }
 
@@ -52,7 +46,7 @@ public class Fulfillment {
         this.fulfillmentDate = fulfillmentDate;
     }
 
-    public void setFulfillmentStatus(String fulfillmentStatus) {
+    public void setFulfillmentStatus(FulfillmentStatus fulfillmentStatus) {
         this.fulfillmentStatus = fulfillmentStatus;
     }
 

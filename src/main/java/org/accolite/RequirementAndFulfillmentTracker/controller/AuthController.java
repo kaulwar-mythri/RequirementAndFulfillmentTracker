@@ -23,10 +23,9 @@ public class AuthController {
         return authService.createUserRole(googleAuthToken);
     }
 
-    @GetMapping("/getUser/{googleAuthToken}")
-    public ResponseEntity<UserRoleDTO> getUser(@PathVariable String googleAuthToken) {
-
-        return authService.getUser(googleAuthToken);
+    @GetMapping("/getUser")
+    public ResponseEntity<String> getUser() {
+        return authService.getUser();
     }
 }
 

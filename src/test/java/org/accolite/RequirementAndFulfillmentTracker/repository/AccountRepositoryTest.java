@@ -20,9 +20,9 @@ class AccountRepositoryTest {
     @Test
     public void addAccount() {
         Account account = Account.builder()
-                .name("Morgan Stanley")
+                .name("BFS")
                 .hierarchyTag(HierarchyTag.CLIENT)
-                .parentId(1)
+                .parentId(0)
                 .build();
 
         accountRepository.save(account);
@@ -32,7 +32,7 @@ class AccountRepositoryTest {
     public void updateUser() {
         UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
         Account account = Account.builder()
-                .name("Golmann Sachs")
+                .name("Morgan Stanley")
                 .hierarchyTag(HierarchyTag.CLIENT)
                 .parentId(1)
                 .build();

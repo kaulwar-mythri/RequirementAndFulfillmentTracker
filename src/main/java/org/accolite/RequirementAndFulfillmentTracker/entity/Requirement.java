@@ -1,13 +1,14 @@
 package org.accolite.RequirementAndFulfillmentTracker.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -30,6 +31,10 @@ public class Requirement {
             referencedColumnName = "account_id"
     )
     private Account account;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "skillId")
+    private Set<Skill> skills = new HashSet<>();
 
     public Long getRequirementId() {
         return requirementId;
