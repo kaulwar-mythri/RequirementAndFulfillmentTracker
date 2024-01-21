@@ -1,5 +1,6 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
+<<<<<<< HEAD
 
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +18,12 @@ import org.accolite.RequirementAndFulfillmentTracker.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+=======
+import org.accolite.RequirementAndFulfillmentTracker.entity.Requirement;
+import org.accolite.RequirementAndFulfillmentTracker.repository.RequirementRepository;
+import org.accolite.RequirementAndFulfillmentTracker.service.RequirementService;
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> origin/alisimran
 import org.springframework.stereotype.Service;
 import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
@@ -26,12 +33,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 public class RequirementServiceImpl implements RequirementService {
 
     @Autowired
     private RequirementRepository requirementsRepository;
+<<<<<<< HEAD
     @Autowired
     private JavaMailSender javaMailSender;
     @Autowired
@@ -46,6 +53,9 @@ public class RequirementServiceImpl implements RequirementService {
     private EntityToDTO entityToDTO;
 
     List<Role> authorised_roles = new ArrayList<>(List.of(Role.REQUIREMENT_MANAGER, Role.ADMIN, Role.SUPER_ADMIN));
+=======
+
+>>>>>>> origin/alisimran
     @Override
     public ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement) {
         checkIfAuthorized(requirement.getAccount());
@@ -64,6 +74,7 @@ public class RequirementServiceImpl implements RequirementService {
     }
 
     @Override
+<<<<<<< HEAD
     public ResponseEntity<RequirementDTO> updateRequirement(Long id, RequirementDTO updatedRequirement) {
         checkIfAuthorized(updatedRequirement.getAccount());
         Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with given ID not found"));
@@ -78,6 +89,19 @@ public class RequirementServiceImpl implements RequirementService {
         existingRequirement = requirementsRepository.save(existingRequirement);
 
         return ResponseEntity.ok(entityToDTO.getRequirementDTO(existingRequirement));
+=======
+    public Requirement updateRequirement(Long id, Requirement updatedRequirement) {
+        Optional<Requirement> existingRequirement = requirementsRepository.findById(id);
+        if (existingRequirement.isPresent()) {
+            Requirement requirementToUpdate = existingRequirement.get();
+            // Update fields based on your needs
+            requirementToUpdate.setStartDate(updatedRequirement.getStartDate());
+            requirementToUpdate.setEndDate(updatedRequirement.getEndDate());
+            requirementToUpdate.setRequiredNo(updatedRequirement.getRequiredNo());
+            requirementToUpdate.setSkillSet(updatedRequirement.getSkillSet());
+            requirementToUpdate.setJob_description(updatedRequirement.getJob_description());
+            requirementToUpdate.setHiring_manager(updatedRequirement.getHiring_manager());
+>>>>>>> origin/alisimran
 
     }
     @Override
@@ -107,6 +131,7 @@ public class RequirementServiceImpl implements RequirementService {
     }
 
     @Override
+<<<<<<< HEAD
     public void alertBench(Long benchManagerId, Set<Long> requirementIds) throws MessagingException {
         List<Requirement> requirements = requirementsRepository.findAllById(requirementIds);
         // using the given id , get the benchmanger's email id and pass it through
@@ -124,10 +149,13 @@ public class RequirementServiceImpl implements RequirementService {
             emailNotificationService.sendNotification("raftspringto@gmail.com", "Requirements Obtained", tableContent);
         }
         return;
+=======
+    public void alertBench(Long benchManagerId, Set<Long> requirementIds) {
+>>>>>>> origin/alisimran
         // Implement alertBench logic based on your requirements
         // You can perform actions like notifying the bench manager or updating the database
-
-        // Retrieve bench manager information (this is just a placeholder)
+//
+//        // Retrieve bench manager information (this is just a placeholder)
 //        BenchManager benchManager = getBenchManagerById(benchManagerId);
 //
 //        // Get the requirements based on the provided IDs
@@ -136,42 +164,6 @@ public class RequirementServiceImpl implements RequirementService {
 //        // Notify the bench manager (this is just a placeholder, replace with your actual notification mechanism)
 //        sendNotificationToBenchManager(benchManager, requirements);
 
-    }
-
-    // method to generate requirements table from a given list of requirement Ids
-
-    private String generateRequirementTable(List<Requirement> requirements) {
-
-        StringBuilder tableContent = new StringBuilder("<table border='1'><tr><th>Start Date</th><th>End Date</th><th>Required Number</th><th>Job Description</th><th>Hiring Manager</th></tr>");
-        /*
-        *   <html>
-<head></head>
-<body>
-<!-- Your table content here -->
-</body>
-</html>
-        * */
-//        tableContent.append("<html>");
-//        tableContent.append("<head>");
-//        tableContent.append("</head>");
-//        tableContent.append("<body>");
-
-        for (Requirement requirement : requirements) {
-            tableContent.append("<tr>")
-                    .append("<td>").append(requirement.getStartDate()).append("</td>")
-                    .append("<td>").append(requirement.getEndDate()).append("</td>")
-                    .append("<td>").append(requirement.getRequiredNo()).append("</td>")
-                    .append("<td>").append(requirement.getJob_description()).append("</td>")
-                    .append("<td>").append(requirement.getHiring_manager()).append("</td>")
-                    .append("</tr>");
-        }
-
-        tableContent.append("</table>");
-
-        tableContent.append("</body>");
-        tableContent.append("</html>");
-
-        return tableContent.toString();
     }
 
 //    private BenchManager getBenchManagerById(Long benchManagerId) {
@@ -185,7 +177,7 @@ public class RequirementServiceImpl implements RequirementService {
 //        // Replace with your actual notification mechanism (email, messaging service, etc.)
 //        System.out.println("Notifying Bench Manager " + benchManager.getName() +
 //                " (" + benchManager.getEmail() + ") about the following requirements: " + requirements);
-//   }
+//    }
 
     @Override
     public void alertHiring(Long hiringManagerId, Set<Long> requirementIds) {

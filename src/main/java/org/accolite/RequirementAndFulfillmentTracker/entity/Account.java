@@ -26,6 +26,7 @@ public class Account {
     HierarchyTag hierarchyTag;
 
     @ManyToMany(mappedBy = "accounts", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
     Set<UserRole> userRoles = new HashSet<>();
 
     public long getId() {

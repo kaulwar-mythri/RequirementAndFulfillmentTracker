@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface RequirementService {
+
     ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement);
     ResponseEntity<RequirementDTO> updateRequirement(Long id, RequirementDTO updatedRequirement);
     ResponseEntity<List<RequirementDTO>> getAllRequirements();

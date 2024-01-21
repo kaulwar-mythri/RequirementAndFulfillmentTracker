@@ -32,7 +32,7 @@ public class UserRole implements UserDetails{
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "users_accounts", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "account_id"))
     Set<Account> accounts = new HashSet<Account>();
-     
+
     String emailId;
 
     public long getId() {

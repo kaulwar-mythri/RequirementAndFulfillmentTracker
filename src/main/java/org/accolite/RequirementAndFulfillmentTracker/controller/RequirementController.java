@@ -1,19 +1,21 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 
 
-import jakarta.mail.MessagingException;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Requirement;
+<<<<<<< HEAD
 import org.accolite.RequirementAndFulfillmentTracker.model.RequirementDTO;
 import org.accolite.RequirementAndFulfillmentTracker.service.EmailNotificationService;
+=======
+>>>>>>> origin/alisimran
 import org.accolite.RequirementAndFulfillmentTracker.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 
 @RestController
 @RequestMapping("/api/requirement")
@@ -21,12 +23,17 @@ public class RequirementController {
     @Autowired
     private RequirementService requirementService;
 
+<<<<<<< HEAD
     @Autowired
     private EmailNotificationService emailNotificationService;
+=======
+    // Endpoint to create a new requirement
+>>>>>>> origin/alisimran
     @PostMapping("/create")
     public ResponseEntity<RequirementDTO> createRequirement(@RequestBody RequirementDTO requirement) {
         return requirementService.createRequirement(requirement);
     }
+
 
     // Endpoint to update an existing requirement by ID
 
@@ -59,10 +66,10 @@ public class RequirementController {
 
         return ResponseEntity.ok("Deleted requirement successfully");
     }
-    // kafka
+
     // Endpoint to alert bench for a bench manager
     @PostMapping("/alertBench")
-    public ResponseEntity<Void> alertBench(@RequestParam Long benchManagerId, @RequestBody Set<Long> requirementIds) throws MessagingException {
+    public ResponseEntity<Void> alertBench(@RequestParam Long benchManagerId, @RequestBody Set<Long> requirementIds) {
         requirementService.alertBench(benchManagerId, requirementIds);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -75,4 +82,7 @@ public class RequirementController {
     }
 
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/alisimran
