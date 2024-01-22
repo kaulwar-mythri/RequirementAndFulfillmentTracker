@@ -28,23 +28,5 @@ class AccountRepositoryTest {
         accountRepository.save(account);
     }
 
-    @Test
-    public void updateUser() {
-        UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
-        Account account = Account.builder()
-                .name("Morgan Stanley")
-                .hierarchyTag(HierarchyTag.CLIENT)
-                .parentId(1)
-                .build();
 
-        Set<Account> accountSet = userRole.getAccounts();
-        if (accountSet == null)
-            accountSet = new HashSet<>();
-        accountSet.add(account);
-
-        userRole.setAccounts(accountSet);
-
-        userRoleRepository.save(userRole);
-
-    }
 }

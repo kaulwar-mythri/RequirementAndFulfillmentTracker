@@ -17,6 +17,8 @@ public class Requirement {
     @GeneratedValue(strategy= GenerationType.AUTO)
     Long requirementId;
 
+    private Long fulfilledNo;
+
     private String startDate;
     private String endDate;
     private Long requiredNo;

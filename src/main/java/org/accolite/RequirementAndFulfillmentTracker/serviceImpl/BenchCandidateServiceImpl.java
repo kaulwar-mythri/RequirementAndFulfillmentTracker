@@ -9,6 +9,7 @@ import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundE
 import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
 import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.BenchCandidateDTO;
+import org.accolite.RequirementAndFulfillmentTracker.model.RequirementDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.BenchCandidateRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
@@ -40,19 +41,26 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     @Override
     public ResponseEntity<BenchCandidateDTO> addCandidate(BenchCandidateDTO candidate) {
         checkIfAuthorized();
+        // check if the candidate exists to avoid duplicate entries
+//        BenchCandidate existingCandidate = benchCandidateRepository.findById(candidate.getId()).orElse(null);
+//        if(existingCandidate == null) {
 
-        UserRole benchManager = userRoleRepository.findById(candidate.getBenchManager().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench manager not found exception"));
-        BenchCandidate newCandidate = BenchCandidate.builder()
-                .candidateName(candidate.getCandidateName())
-                .skills(candidate.getSkills())
-                .benchManager(benchManager)
-                .benchPeriod(candidate.getBenchPeriod())
-                .status(candidate.getCandidateStatus())
-                .build();
+            UserRole benchManager = userRoleRepository.findById(candidate.getBenchManager().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench manager not found exception"));
+            BenchCandidate newCandidate = BenchCandidate.builder()
+                    .candidateName(candidate.getCandidateName())
+                    .benchCandidateSkills(candidate.getBenchCandidateSkills())
+                    .benchManager(benchManager)
+                    .benchPeriod(candidate.getBenchPeriod())
+                    .status(candidate.getCandidateStatus())
+                    .build();
 
-        newCandidate = benchCandidateRepository.save(newCandidate);
+            newCandidate = benchCandidateRepository.save(newCandidate);
 
-        return ResponseEntity.ok(entityToDTO.getBenchCandidateDTO(newCandidate));
+            return ResponseEntity.ok(entityToDTO.getBenchCandidateDTO(newCandidate));
+//        }
+//
+//        String errorMessage = "User with username " + entityToDTO.getBenchCandidateDTO(existingCandidate).getCandidateName() + " already exists.";
+//        return ResponseEntity.
     }
 
     @Override
@@ -93,8 +101,13 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
 
     @Override
     public ResponseEntity<String> deleteCandidate(Long id) {
+
+        BenchCandidate candidate = benchCandidateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
+        BenchCandidateDTO benchCandidateDTO = entityToDTO.getBenchCandidateDTO(candidate);
         checkIfAuthorized();
+        candidate.setBenchManager(null);
         benchCandidateRepository.deleteById(id);
+
         return ResponseEntity.ok("Successfully deleted bench candidate");
     }
 

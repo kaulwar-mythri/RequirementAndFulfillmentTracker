@@ -24,15 +24,70 @@ class UserRoleRepositoryTest {
     AccountRepository accountRepository;
 
     @Test
-    public void updateUserRole() {
+    public void saveUserRoleWithAccount() {
 
         UserRole userRole = UserRole.builder()
-                .id(1)
-                .emailId("kaulwar.mythri@accolitedigital.com")
-                .employeeId(7495)
-                .role(Role.REQUIREMENT_MANAGER)
+                .id(2)
+                .emailId("simran.ali@accolitedigital.com")
+                .employeeId(7489)
+                .role(Role.ADMIN)
                 .build();
+
+        Account account = accountRepository.findById(2L).orElse(null);
+
+        Set<Account> accountSet = new HashSet<>();
+        accountSet.add(account);
+
+        userRole.setAccounts(accountSet);
+
 
         userRoleRepository.save(userRole);
     }
+
+
+    @Test
+    public void saveUserRoles(){
+        UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
+
+        Account account = Account.builder()
+                .name("DFA")
+                .hierarchyTag(HierarchyTag.DEPARTMENT)
+                .parentId(2)
+                .build();
+
+        Set<Account> accountSet = new HashSet<>();
+        accountSet.add(account);
+
+        userRole.setAccounts(accountSet);
+
+//        userRoleRepository.save(userRole);
+//        UserRole benchmanager = UserRole.builder()
+//                .role(Role.ADMIN)
+//                .emailId("raft.user.from@gmail.com")
+//                .accounts(accountSet)
+//                .build();
+//        Set<UserRole> userRoles = new HashSet<>();
+//        userRoles.add(userRole);
+        userRoleRepository.save(userRole);
+    }
+
+//    @Test
+//    public void updateUser() {
+//        UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
+//        Account account = Account.builder()
+//                .name("Morgan Stanley")
+//                .hierarchyTag(HierarchyTag.CLIENT)
+//                .parentId(1)
+//                .build();
+//
+//        Set<Account> accountSet = userRole.getAccounts();
+//        if (accountSet == null)
+//            accountSet = new HashSet<>();
+//        accountSet.add(account);
+//
+//        userRole.setAccounts(accountSet);
+//
+//        userRoleRepository.save(userRole);
+//
+//    }
 }

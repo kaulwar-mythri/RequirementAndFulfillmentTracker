@@ -16,6 +16,7 @@ public class Fulfillment {
     private Long fulfillmentId;
 
     private String fulfillmentDate;
+    @Enumerated(EnumType.STRING)
     private FulfillmentStatus fulfillmentStatus;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

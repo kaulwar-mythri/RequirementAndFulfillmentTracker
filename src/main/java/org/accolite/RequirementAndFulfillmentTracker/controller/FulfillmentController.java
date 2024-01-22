@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/fulfillments")
+@RequestMapping("/api/fulfillments")
+@CrossOrigin(origins="http://localhost:4200")
 public class FulfillmentController {
 
     @Autowired

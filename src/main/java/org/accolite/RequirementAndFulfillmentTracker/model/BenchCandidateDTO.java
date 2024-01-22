@@ -15,7 +15,7 @@ public class BenchCandidateDTO {
     long id;
     CandidateStatus candidateStatus;
     String candidateName;
-    Set<Skill> skills;
+    String benchCandidateSkills;
     int benchPeriod;
     UserRoleDTO benchManager;
 }

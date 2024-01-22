@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/accounts")
 public class AccountController {
+    // remove all the delete functions
+    // swagger me implement krna hai
+    // swagger apis
+    // check if can use firebase as backend
     @Autowired
     AccountService accountService;
 

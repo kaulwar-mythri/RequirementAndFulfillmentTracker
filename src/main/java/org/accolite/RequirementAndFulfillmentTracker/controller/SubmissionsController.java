@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/submission")
+@RequestMapping("/api/submission")
 @CrossOrigin(origins = "http://localhost:4200/")
 public class SubmissionsController {
 
@@ -35,12 +35,13 @@ public class SubmissionsController {
 
     @PutMapping("/{id}/update")
     public SubmissionDTO updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
-        return submissionsService.updateSubmission(id, updatedSubmission);
+        // this getBody() needs to be reviewed
+        return submissionsService.updateSubmission(id, updatedSubmission).getBody();
     }
-
+    // not working
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<String> deleteSubmission(@PathVariable Long id) {
         submissionsService.deleteSubmission(id);
-        return ResponseEntity.ok("Successfully deleted fulfillment");
+        return ResponseEntity.ok("Successfully deleted submission");
     }
 }

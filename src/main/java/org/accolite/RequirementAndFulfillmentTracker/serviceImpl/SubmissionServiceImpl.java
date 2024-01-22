@@ -41,7 +41,11 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public ResponseEntity<SubmissionDTO> createSubmission(SubmissionDTO submission) {
         checkIfAuthorized(submission.getRequirement().getAccount());
-        Requirement requirement = requirementRepository.findById(submission.getRequirement().getRequirementID()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
+        /*  1. when adding a new submission , check if the submission status is SELECTED then update the candidate status in the candidate bench
+         *  2. also duplicate entries not handled, it keeps adding -> instead of auto generated Ids replace by user employee id -> which would be passed
+         *   candidate status , and bench startDate and endDate
+         * */
+        Requirement requirement = requirementRepository.findById(submission.getRequirement().getRequirementId()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
         BenchCandidate benchCandidate = benchCandidateRepository.findById(submission.getBenchCandidate().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench candidate with given id not found"));
         Submission newSubmission = Submission.builder()
                 .submissionDate(submission.getSubmissionDate())
@@ -51,7 +55,18 @@ public class SubmissionServiceImpl implements SubmissionService {
                 .feedback(submission.getFeedback())
                 .build();
         newSubmission = submissionRepository.save(newSubmission);
+        // handle cases when candidate submission status is selected then need to update bench candidate status too
+        if(newSubmission.getSubmissionStatus() == SubmissionStatus.ACCEPTED){
+            updateCandidateStatusIfSelected(benchCandidate);
+        }
         return ResponseEntity.ok(entityToDTO.getSubmissionDTO(newSubmission));
+    }
+
+    // update the candidate status if they are selected, bench manager can then update the status accordingly
+    // for eg if bg check is going on or onboarding
+    public void updateCandidateStatusIfSelected(BenchCandidate benchCandidate){
+        benchCandidate.setStatus(CandidateStatus.SELECTED);
+        benchCandidateRepository.save(benchCandidate);
     }
 
     @Override
@@ -73,7 +88,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     public ResponseEntity<SubmissionDTO> updateSubmission(Long id, SubmissionDTO updatedSubmission) {
         checkIfAuthorized(updatedSubmission.getRequirement().getAccount());
         BenchCandidate benchCandidate = benchCandidateRepository.findById(updatedSubmission.getBenchCandidate().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench Candidate with given id not found"));
-        Requirement requirement = requirementRepository.findById(updatedSubmission.getRequirement().getRequirementID()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
+        Requirement requirement = requirementRepository.findById(updatedSubmission.getRequirement().getRequirementId()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
         Submission existingSubmission = submissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Submission with given id not found"));
 
         existingSubmission.setSubmissionId(updatedSubmission.getSubmissionId());
@@ -92,6 +107,10 @@ public class SubmissionServiceImpl implements SubmissionService {
         Submission submission = submissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Submission with given id not found"));
         AccountDTO accountDTO = entityToDTO.getAccountDTO(submission.getRequirement().getAccount());
         checkIfAuthorized(accountDTO);
+        // foreign key not set null hence not working
+        submission.setBenchCandidate(null);
+        submission.setRequirement(null);
+
         submissionRepository.deleteById(id);
     }
 
@@ -99,8 +118,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
         Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
-        List<Account> userBUs = user.getAccounts().stream().filter(account -> {
-            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
+        List<Account> userBUs = user.getAccounts().stream().map(account -> {
+            return accountRepository.findById(account.getParentId()).orElse(null);
         }).collect(Collectors.toList());
 
         if(!userBUs.contains(requirementBU)) {

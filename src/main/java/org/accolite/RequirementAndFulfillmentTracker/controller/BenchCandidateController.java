@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/bench")
 public class BenchCandidateController {
 
     @Autowired
     private BenchCandidateService benchCandidateService;
 
-    // working
+    // working but duplicate case has not been handled
     @PostMapping("/addCandidate")
     public ResponseEntity<BenchCandidateDTO> addCandidate(@RequestBody BenchCandidateDTO candidate) {
         return benchCandidateService.addCandidate(candidate);

@@ -22,10 +22,11 @@ public class BenchCandidate {
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
-    private Set<Skill> skills = new HashSet<>();
+//      need to ask whether to remove this skill table altogether or not??
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
+//    private Set<Skill> skills = new HashSet<>();
+    String benchCandidateSkills;
 
     private int benchPeriod;
 

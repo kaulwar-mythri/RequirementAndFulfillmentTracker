@@ -1,9 +1,6 @@
 package org.accolite.RequirementAndFulfillmentTracker.repository;
 
-import org.accolite.RequirementAndFulfillmentTracker.entity.Experience;
-import org.accolite.RequirementAndFulfillmentTracker.entity.Requirement;
-import org.accolite.RequirementAndFulfillmentTracker.entity.Skill;
-import org.accolite.RequirementAndFulfillmentTracker.entity.Technology;
+import org.accolite.RequirementAndFulfillmentTracker.entity.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +15,8 @@ class RequirementRepositoryTest {
     @Autowired
     private RequirementRepository requirementRepository;
 
+    @Autowired
+    private AccountRepository accountRepository;
     @Test
     public void saveRequirement(){
         Skill skill = Skill.builder()
@@ -30,9 +29,24 @@ class RequirementRepositoryTest {
                 .requiredNo(10L)
                 .job_description("required advanced java skills")
                 .hiring_manager("vipin")
-                .skillSet((Set<Skill>) skill)
+//                .skillSet((Set<Skill>) skill)
                 .build();
 
+    }
+
+
+    @Test
+    public void saveRequirementWithAccount(){
+        Account account = accountRepository.findById(1L).orElse(null);
+        Requirement requirement = Requirement.builder()
+                .requiredNo(30L)
+                .job_description("spring boot developer")
+                .hiring_manager("simran")
+                .endDate("March 2021")
+                .startDate("July 2021")
+                .account(account)
+                .build();
+        requirementRepository.save(requirement);
     }
 
 }
