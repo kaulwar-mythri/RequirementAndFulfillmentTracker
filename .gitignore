@@ -3,6 +3,7 @@ HELP.md
 build.gradle
 resources/application.properties
 text.txt
+swagger.txt
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

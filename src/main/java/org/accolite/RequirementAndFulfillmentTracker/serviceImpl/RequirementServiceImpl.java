@@ -93,6 +93,23 @@ public class RequirementServiceImpl implements RequirementService {
 //        }).collect(Collectors.toList());
 //        return ResponseEntity.ok(requirementDTOS);
 //    }
+//    @Override
+//    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
+//        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+//        List<AccountDTO> user_BUaccounts = userRole.getAccounts().stream().map(accountDTO -> {
+//            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Accpunt not found")));
+//        }).collect(Collectors.toList());
+//
+//        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
+//            return entityToDTO.getRequirementDTO(requirement);
+//        }).filter(requirementDTO -> {
+//            AccountDTO requirementBU = entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+//            return user_BUaccounts.contains(requirementBU);
+//        }).collect(Collectors.toList());
+//        return ResponseEntity.ok(requirementDTOS);
+//    }
+
+
     @Override
     public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
@@ -127,6 +144,19 @@ public class RequirementServiceImpl implements RequirementService {
             return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
+    }
+
+
+
+
+
+
+
+    @Override
+    public ResponseEntity<RequirementDTO> getRequirementById(Long id) {
+        Requirement requirement = requirementsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requirement not found with id: " + id));
+        return ResponseEntity.ok(entityToDTO.getRequirementDTO(requirement));
     }
 
     @Override
