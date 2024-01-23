@@ -34,9 +34,9 @@ public class SubmissionsController {
     }
 
     @PutMapping("/{id}/update")
-    public SubmissionDTO updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
-        // this getBody() needs to be reviewed
-        return submissionsService.updateSubmission(id, updatedSubmission).getBody();
+
+    public ResponseEntity<SubmissionDTO> updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
+        return submissionsService.updateSubmission(id, updatedSubmission);
     }
     // not working
     @DeleteMapping("/{id}/delete")

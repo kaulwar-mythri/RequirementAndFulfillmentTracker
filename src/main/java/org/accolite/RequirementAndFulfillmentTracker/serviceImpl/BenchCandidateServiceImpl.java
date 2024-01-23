@@ -65,7 +65,9 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
 
     @Override
     public List<BenchCandidateDTO> getAllCandidates() {
-        List<BenchCandidate> benchCandidatesList = benchCandidateRepository.findAll();
+        List<BenchCandidate> benchCandidatesList = benchCandidateRepository.findAll().stream().filter(candidate -> {
+            return candidate.getStatus() != CandidateStatus.SELECTED;
+        }).toList();
 
         return benchCandidatesList.stream().map(candidate -> entityToDTO.getBenchCandidateDTO(candidate)).collect(Collectors.toList());
     }

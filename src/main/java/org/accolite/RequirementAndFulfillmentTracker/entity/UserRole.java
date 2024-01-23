@@ -34,6 +34,7 @@ public class UserRole implements UserDetails{
     Set<Account> accounts = new HashSet<Account>();
 
     String emailId;
+    String name;
 
     public long getId() {
         return id;

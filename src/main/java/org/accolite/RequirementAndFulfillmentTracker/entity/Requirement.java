@@ -22,7 +22,7 @@ public class Requirement {
     private String startDate;
     private String endDate;
     private Long requiredNo;
-
+    private Long fulfilledNo;
     private String job_description;
     private String hiring_manager;
     @ManyToOne(
@@ -33,10 +33,6 @@ public class Requirement {
             referencedColumnName = "account_id"
     )
     private Account account;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "skillId")
-    private Set<Skill> skills = new HashSet<>();
 
     public Long getRequirementId() {
         return requirementId;
