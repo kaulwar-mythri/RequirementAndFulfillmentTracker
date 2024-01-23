@@ -9,6 +9,7 @@ import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundE
 import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
 import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.RequirementDTO;
+import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.RequirementRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
@@ -82,8 +83,30 @@ public class RequirementServiceImpl implements RequirementService {
     }
     @Override
     public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
+        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
+                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+        //user_accounts -> storing all accounts of least level
+        Set<AccountDTO> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+        }).collect(Collectors.toSet());
+
         List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
             return entityToDTO.getRequirementDTO(requirement);
+        }).filter(requirementDTO -> {
+            AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                    (user_accounts.contains(requirementAccount)
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))))
+                return true;
+
+            return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
     }
@@ -196,14 +219,17 @@ public class RequirementServiceImpl implements RequirementService {
     //requirement_account is
     private void checkIfAuthorized(AccountDTO requirement_account) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
-        Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirement_account.getAccount_id()).orElseThrow(() -> new ResourceNotFoundException("Account not found")));
 
-        List<Account> userBUs = user.getAccounts().stream().filter(account -> {
-            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
-        }).collect(Collectors.toList());
+        Set<AccountDTO> user_accounts = entityToDTO.getUserRoleDTO(user).getAccounts();
 
-        if(!authorised_roles.contains(user.getRole()) || !userBUs.contains(requirementBU)) {
+        if(!authorised_roles.contains(user.getRole()) || !user_accounts.contains(requirementAccount)) {
             throw new UserUnauthorisedException("User is not authorised to perform the above operation");
         }
     }
 }
+
+//store dept in requirement
+//account and below access - for view, add, edit
+//Swagger APIs
+//Check if we can use firebase's backend

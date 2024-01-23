@@ -25,9 +25,10 @@ public class BenchCandidate {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
-    private Set<Skill> skills = new HashSet<>();
-
+    private Set<Skill> skills = new HashSet<>();  //remove
+    private String candidate_skill_description;
     private int benchPeriod;
+    //start-date and end-date
 
     // shouldn't this be mapped to userrole ??
     @ManyToOne

@@ -3,12 +3,10 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
         import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
         import org.accolite.RequirementAndFulfillmentTracker.entity.*;
+        import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceInUseException;
         import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
         import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
-        import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
-        import org.accolite.RequirementAndFulfillmentTracker.model.BenchCandidateDTO;
-        import org.accolite.RequirementAndFulfillmentTracker.model.RequirementDTO;
-        import org.accolite.RequirementAndFulfillmentTracker.model.SubmissionDTO;
+        import org.accolite.RequirementAndFulfillmentTracker.model.*;
         import org.accolite.RequirementAndFulfillmentTracker.repository.*;
         import org.accolite.RequirementAndFulfillmentTracker.service.SubmissionService;
         import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
@@ -18,6 +16,7 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
         import java.util.List;
         import java.util.Optional;
+        import java.util.Set;
         import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +42,8 @@ public class SubmissionServiceImpl implements SubmissionService {
         checkIfAuthorized(submission.getRequirement().getAccount());
         Requirement requirement = requirementRepository.findById(submission.getRequirement().getRequirementID()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
         BenchCandidate benchCandidate = benchCandidateRepository.findById(submission.getBenchCandidate().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench candidate with given id not found"));
+        if(benchCandidate.getStatus() == CandidateStatus.HOLD || benchCandidate.getStatus() == CandidateStatus.SELECTED) throw new ResourceInUseException("Candidate with given id was either submitted for another client interview or selected by another client");
+
         Submission newSubmission = Submission.builder()
                 .submissionDate(submission.getSubmissionDate())
                 .submissionStatus(submission.getSubmissionStatus())
@@ -51,16 +52,40 @@ public class SubmissionServiceImpl implements SubmissionService {
                 .feedback(submission.getFeedback())
                 .build();
         newSubmission = submissionRepository.save(newSubmission);
+        benchCandidate.setStatus(CandidateStatus.HOLD); benchCandidateRepository.save(benchCandidate);
         return ResponseEntity.ok(entityToDTO.getSubmissionDTO(newSubmission));
     }
 
     @Override
     public ResponseEntity<List<SubmissionDTO>> getAllSubmissions() {
-         List<SubmissionDTO> submissionDTOList = submissionRepository.findAll().stream().map(submission -> {
-            return entityToDTO.getSubmissionDTO(submission);
-        }).collect(Collectors.toList());
+        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
+                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
 
-         return ResponseEntity.ok(submissionDTOList);
+        //user_accounts -> storing all accounts of least level
+        Set<AccountDTO> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+        }).collect(Collectors.toSet());
+
+        List<SubmissionDTO> submissionDTOS =  submissionRepository.findAll().stream().map(submission -> {
+            return entityToDTO.getSubmissionDTO(submission);
+        }).filter(submissionDTO -> {
+            AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(submissionDTO.getRequirement().getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+
+            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                    (user_accounts.contains(requirementAccount)
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))))
+                return true;
+
+            return false;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(submissionDTOS);
     }
 
     @Override
@@ -97,13 +122,12 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     private void checkIfAuthorized(AccountDTO requirement_account) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
-        Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirement_account.getAccount_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
 
-        List<Account> userBUs = user.getAccounts().stream().filter(account -> {
-            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
-        }).collect(Collectors.toList());
+        Set<AccountDTO> user_accounts = entityToDTO.getUserRoleDTO(user).getAccounts();
 
-        if(!userBUs.contains(requirementBU)) {
+        if(!user_accounts.contains(requirementAccount)) {
             throw new UserUnauthorisedException("User is not authorised to perform the above operation");
         }
     }

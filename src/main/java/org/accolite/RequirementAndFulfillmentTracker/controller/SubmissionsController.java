@@ -34,7 +34,7 @@ public class SubmissionsController {
     }
 
     @PutMapping("/{id}/update")
-    public SubmissionDTO updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
+    public ResponseEntity<SubmissionDTO> updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {
         return submissionsService.updateSubmission(id, updatedSubmission);
     }
 
