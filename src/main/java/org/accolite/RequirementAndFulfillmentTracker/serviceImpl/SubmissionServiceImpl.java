@@ -14,6 +14,7 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
         import org.springframework.http.ResponseEntity;
         import org.springframework.stereotype.Service;
 
+        import java.util.ArrayList;
         import java.util.List;
         import java.util.Optional;
         import java.util.Set;
@@ -36,6 +37,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     private AccountRepository accountRepository;
     @Autowired
     private JWTService jwtService;
+
+    List<Role> authorised_roles = new ArrayList<>(List.of(Role.REQUIREMENT_MANAGER, Role.ADMIN, Role.SUPER_ADMIN, Role.BENCH_MANAGER, Role.HIRING_MANAGER));
       //discuss
     @Override
     public ResponseEntity<SubmissionDTO> createSubmission(SubmissionDTO submission) {
@@ -71,19 +74,26 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     public ResponseEntity<List<SubmissionDTO>> getAllSubmissions() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
-                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
+
+        Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
+        if(user_role == Role.ADMIN || user_role == Role.SUPER_ADMIN) {
+            return ResponseEntity.ok(submissionRepository.findAll().stream().map(submission -> {
+                return entityToDTO.getSubmissionDTO(submission);
+            }).toList());
+        }
 
         //user_accounts -> storing all accounts of least level
-        Set<AccountDTO> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
-            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
         }).collect(Collectors.toSet());
 
         List<SubmissionDTO> submissionDTOS =  submissionRepository.findAll().stream().map(submission -> {
             return entityToDTO.getSubmissionDTO(submission);
         }).filter(submissionDTO -> {
-            AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(submissionDTO.getRequirement().getAccount().getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+            Account requirementAccount = accountRepository.findById(submissionDTO.getRequirement().getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
             if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
                 return true;
@@ -98,12 +108,6 @@ public class SubmissionServiceImpl implements SubmissionService {
             return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(submissionDTOS);
-    }
-
-    @Override
-    public ResponseEntity<SubmissionDTO> getSubmissionById(Long id) {
-        SubmissionDTO submissionDTO =  entityToDTO.getSubmissionDTO(submissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Submission with given id not found")));
-        return ResponseEntity.ok(submissionDTO);
     }
 
     @Override
@@ -136,19 +140,26 @@ public class SubmissionServiceImpl implements SubmissionService {
         submissionRepository.deleteById(id);
     }
 
-    private void checkIfAuthorized(AccountDTO requirement_account) {
+    private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
-        AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirement_account.getAccount_id())
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
 
-        List<Account> userBUs = user.getAccounts().stream().map(account -> {
-            return accountRepository.findById(account.getParentId()).orElse(null);
-        }).collect(Collectors.toList());
-        Set<AccountDTO> user_accounts = entityToDTO.getUserRoleDTO(user).getAccounts();
+        Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
 
-        if(!user_accounts.contains(requirementAccount)) {
+        Account requirementAccount = accountRepository.findById(requirement_accountDTO.getAccount_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && !user_accounts.contains(requirementAccount)))
             throw new UserUnauthorisedException("User is not authorised to perform the above operation");
-        }
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && !(user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null))))))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                !(user_accounts.contains(requirementAccount)
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))
+                )))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
     }
 
 }

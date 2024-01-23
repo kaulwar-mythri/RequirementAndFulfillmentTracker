@@ -12,7 +12,5 @@ public interface AccountService {
 
     public List<Account> getAllAccounts();
 
-    public Account getAccountById(long id);
-
     public ResponseEntity<String> deleteAccountById(long id);
 }

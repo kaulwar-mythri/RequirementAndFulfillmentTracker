@@ -47,12 +47,6 @@ public class RequirementController {
     }
 
     // Endpoint to get a requirement by ID
-    // working
-    @GetMapping("/{id}")
-    public ResponseEntity<RequirementDTO> getRequirementById(@PathVariable Long id) {
-        return requirementService.getRequirementById(id);
-    }
-
     // Endpoint to delete a requirement by ID
     // working
     @DeleteMapping("/{id}/delete")

@@ -61,19 +61,25 @@ public class FulfillmentServiceImpl implements FulfillmentService {
     @Override
     public ResponseEntity<List<FulfillmentDTO>> getAllFulfillments() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
-                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
 
+        Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
+        if(user_role == Role.ADMIN || user_role == Role.SUPER_ADMIN) {
+            return ResponseEntity.ok(fulfillmentRepository.findAll().stream().map(fulfillment -> {
+                return entityToDTO.getFulfillmentDTO(fulfillment);
+            }).toList());
+        }
         //user_accounts -> storing all accounts of least level
-        Set<AccountDTO> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
-            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
         }).collect(Collectors.toSet());
 
         List<FulfillmentDTO> fulfillmentDTOS =  fulfillmentRepository.findAll().stream().map(fulfillment -> {
             return entityToDTO.getFulfillmentDTO(fulfillment);
         }).filter(fulfillmentDTO -> {
-            AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(fulfillmentDTO.getSubmission().getRequirement().getAccount().getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+            Account requirementAccount = accountRepository.findById(fulfillmentDTO.getSubmission().getRequirement().getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
             if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
                 return true;
@@ -89,13 +95,6 @@ public class FulfillmentServiceImpl implements FulfillmentService {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(fulfillmentDTOS);
     }
-
-    @Override
-    public ResponseEntity<FulfillmentDTO> getFulfillmentById(Long fulfillmentId) {
-        FulfillmentDTO fulfillmentDTO =  entityToDTO.getFulfillmentDTO(fulfillmentRepository.findById(fulfillmentId).orElseThrow(() -> new ResourceNotFoundException("Fulfillment with given id not found")));
-        return ResponseEntity.ok(fulfillmentDTO);
-    }
-
     @Override
     public ResponseEntity<FulfillmentDTO> updateFulfillment(Long fulfillmentID, FulfillmentDTO updatedFulfillment) {
         Submission submission = submissionRepository.findById(updatedFulfillment.getSubmission().getSubmissionId())
@@ -120,16 +119,26 @@ public class FulfillmentServiceImpl implements FulfillmentService {
         fulfillmentRepository.deleteById(fulfillmentId);
     }
 
-    private void checkIfAuthorized(AccountDTO requirement_account) {
+    private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
-        AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirement_account.getAccount_id())
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
 
-        Set<AccountDTO> user_accounts = entityToDTO.getUserRoleDTO(user).getAccounts();
+        Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
 
-        if(!authorised_roles.contains(user.getRole()) || !user_accounts.contains(requirementAccount)) {
+        Account requirementAccount = accountRepository.findById(requirement_accountDTO.getAccount_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && !user_accounts.contains(requirementAccount)))
             throw new UserUnauthorisedException("User is not authorised to perform the above operation");
-        }
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && !(user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null))))))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                !(user_accounts.contains(requirementAccount)
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))
+                )))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
     }
 
     private void updateRequirement(SubmissionDTO submission) {

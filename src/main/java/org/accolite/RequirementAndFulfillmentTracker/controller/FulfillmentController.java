@@ -35,11 +35,6 @@ public class FulfillmentController {
         return fulfillmentService.getAllFulfillments();
     }
 
-    @GetMapping("/{fulfillmentId}")
-    public ResponseEntity<FulfillmentDTO> getFulfillmentById(@PathVariable Long fulfillmentId) {
-        return fulfillmentService.getFulfillmentById(fulfillmentId);
-    }
-
     @DeleteMapping("/{fulfillmentId}/delete")
     public void deleteFulfillment(@PathVariable Long fulfillmentId) {
         fulfillmentService.deleteFulfillment(fulfillmentId);

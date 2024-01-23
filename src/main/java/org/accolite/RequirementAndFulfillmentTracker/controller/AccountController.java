@@ -34,10 +34,6 @@ public class AccountController {
     public List<Account> getAllAccounts() {
         return accountService.getAllAccounts();
     }
-    @GetMapping("/{id}")
-    public Account getAccountById(@PathVariable long id) {
-        return accountService.getAccountById(id);
-    }
 
     // Delete Account by ID
     @DeleteMapping("/{id}/delete")

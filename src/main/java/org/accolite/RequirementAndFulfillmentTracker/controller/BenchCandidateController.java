@@ -35,11 +35,6 @@ public class BenchCandidateController {
     }
 
     // working
-    @GetMapping("/{id}")
-    public ResponseEntity<BenchCandidateDTO> getCandidateById(@PathVariable Long id) {
-        return benchCandidateService.getCandidateById(id);
-    }
-    // working
     @PutMapping("/{id}/update")
     public ResponseEntity<BenchCandidateDTO> updateCandidate(@PathVariable Long id, @RequestBody BenchCandidateDTO updatedCandidate) {
         return benchCandidateService.updateCandidate(id, updatedCandidate);
