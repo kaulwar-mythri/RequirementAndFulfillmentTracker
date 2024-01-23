@@ -4,10 +4,7 @@ import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
 import org.accolite.RequirementAndFulfillmentTracker.entity.*;
 import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
 import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
-import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
-import org.accolite.RequirementAndFulfillmentTracker.model.BenchCandidateDTO;
-import org.accolite.RequirementAndFulfillmentTracker.model.FulfillmentDTO;
-import org.accolite.RequirementAndFulfillmentTracker.model.SubmissionDTO;
+import org.accolite.RequirementAndFulfillmentTracker.model.*;
 import org.accolite.RequirementAndFulfillmentTracker.repository.*;
 import org.accolite.RequirementAndFulfillmentTracker.service.FulfillmentService;
 import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
@@ -15,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,14 +60,44 @@ public class FulfillmentServiceImpl implements FulfillmentService {
         requirementRepository.save(requirement);
     }
 
+//    @Override
+//    public ResponseEntity<List<FulfillmentDTO>> getAllFulfillments() {
+//        List<FulfillmentDTO> fulfillmentDTOS = fulfillmentRepository.findAll().stream().map(fulfillment -> {
+//            return entityToDTO.getFulfillmentDTO(fulfillment);
+//        }).collect(Collectors.toList());
+//        return ResponseEntity.ok(fulfillmentDTOS);
+//    }
+
     @Override
     public ResponseEntity<List<FulfillmentDTO>> getAllFulfillments() {
-        List<FulfillmentDTO> fulfillmentDTOS = fulfillmentRepository.findAll().stream().map(fulfillment -> {
+        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
+        //user_accounts -> storing all accounts of least level
+        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
+
+        List<FulfillmentDTO> fulfillmentDTOS =  fulfillmentRepository.findAll().stream().map(fulfillment -> {
             return entityToDTO.getFulfillmentDTO(fulfillment);
+        }).filter(fulfillmentDTO -> {
+            Account requirementAccount = accountRepository.findById(fulfillmentDTO.getSubmission().getRequirement().getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
+                return true;
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                    (user_accounts.contains(requirementAccount)
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))))
+                return true;
+
+            return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(fulfillmentDTOS);
     }
-
     @Override
     public ResponseEntity<FulfillmentDTO> getFulfillmentById(Long fulfillmentId) {
         FulfillmentDTO fulfillmentDTO =  entityToDTO.getFulfillmentDTO(fulfillmentRepository.findById(fulfillmentId).orElseThrow(() -> new ResourceNotFoundException("Fulfillment with given id not found")));

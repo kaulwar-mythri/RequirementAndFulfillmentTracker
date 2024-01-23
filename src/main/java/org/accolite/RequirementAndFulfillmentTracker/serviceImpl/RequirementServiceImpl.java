@@ -86,7 +86,7 @@ public class RequirementServiceImpl implements RequirementService {
 
 
     }
-
+// first time
 //    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
 //        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
 //            return entityToDTO.getRequirementDTO(requirement);
@@ -109,33 +109,79 @@ public class RequirementServiceImpl implements RequirementService {
 //        return ResponseEntity.ok(requirementDTOS);
 //    }
 
+// second time
+//    @Override
+//    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
+//        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
+//                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+//        //user_accounts -> storing all accounts of least level
+//        Set<AccountDTO> user_accounts = userRole.getAccounts();
+//
+//        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
+//            return entityToDTO.getRequirementDTO(requirement);
+//        }).filter(requirementDTO -> {
+//            AccountDTO
+//                    requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getAccount_id())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+//            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
+//                return true;
+//            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
+//                return true;
+//            else return requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+//                        (user_accounts.contains(requirementAccount)
+//                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+//                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null))));
+//        }).collect(Collectors.toList());
+//        return ResponseEntity.ok(requirementDTOS);
+//    }
+
 
     @Override
     public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
                 .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+
+        Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
+        if(user_role == Role.ADMIN || user_role == Role.SUPER_ADMIN) {
+            return ResponseEntity.ok(requirementsRepository.findAll().stream().map(requirement -> {
+                return entityToDTO.getRequirementDTO(requirement);
+            }).toList());
+        }
         //user_accounts -> storing all accounts of least level
-        Set<AccountDTO> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
-            return entityToDTO.getAccountDTO(accountRepository.findById(accountDTO.getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Accpunt not found")));
+        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
         }).collect(Collectors.toSet());
+
+
+
 
         List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
             return entityToDTO.getRequirementDTO(requirement);
         }).filter(requirementDTO -> {
-            AccountDTO requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
-            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementDTO.getAccount()))
+            Account requirementAccount = accountRepository.findById(requirementDTO.getAccount().getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
                 return true;
-            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementDTO.getAccount()) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getParentId()).orElse(null)))))
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
                 return true;
-            else return requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
-                        (user_accounts.contains(requirementAccount)
-                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
-                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null))));
+            else if(requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                    (user_accounts.contains(requirementAccount)
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                            || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))))
+                return true;
+
+            return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
     }
+
+
+
+
+
+
+
 
 
 
@@ -228,21 +274,54 @@ public class RequirementServiceImpl implements RequirementService {
 
     //requirement_account is
     // this is wrong, the second condition is giving false
-    private void checkIfAuthorized(AccountDTO requirement_account) {
-        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
-        Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-
-//        List<Account> userBUs = user.getAccounts().stream().map(account -> {
-//            Account parentAccount = accountRepository.findById(account.getParentId()).orElse(null);
-//            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
+//    private void checkIfAuthorized(AccountDTO requirement_account) {
+//        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+//        Account requirementBU = accountRepository.findById(requirement_account.getParentId()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 //
+////        List<Account> userBUs = user.getAccounts().stream().map(account -> {
+////            Account parentAccount = accountRepository.findById(account.getParentId()).orElse(null);
+////            return account.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT;
+////
+////        }).collect(Collectors.toList());
+//        List<Account> userBUs = user.getAccounts().stream().map(account -> {
+//            return accountRepository.findById(account.getParentId()).orElse(null);
 //        }).collect(Collectors.toList());
-        List<Account> userBUs = user.getAccounts().stream().map(account -> {
-            return accountRepository.findById(account.getParentId()).orElse(null);
-        }).collect(Collectors.toList());
+//
+//        if(!authorised_roles.contains(user.getRole()) || !userBUs.contains(requirementBU)) {
+//            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+//        }
+//    }
 
-        if(!authorised_roles.contains(user.getRole()) || !userBUs.contains(requirementBU)) {
+
+    private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
+        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+
+        Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
+
+        Account requirementAccount = accountRepository.findById(requirement_accountDTO.getAccount_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && !user_accounts.contains(requirementAccount)))
             throw new UserUnauthorisedException("User is not authorised to perform the above operation");
-        }
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && !(user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null))))))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+        else if(!authorised_roles.contains(user.getRole()) || (requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+                !(user_accounts.contains(requirementAccount)
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+                        || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null)))
+                )))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
     }
+
+
+
+
+
+
+
+
+
+
 }

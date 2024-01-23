@@ -44,6 +44,7 @@ public class EntityToDTO {
                 .requirementId(requirement.getRequirementId())
                 .account(requirement_accountDTO)
                 .requiredNo(requirement.getRequiredNo())
+                .fulfilledNo(requirement.getFulfilledNo())
                 .startDate(requirement.getStartDate())
                 .endDate(requirement.getEndDate())
                 .jobDescription(requirement.getJob_description())

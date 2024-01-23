@@ -11,17 +11,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
-// adding enable web mvc
-@EnableWebMvc
 @EnableWebSecurity
-@EnableSwagger2
 @RequiredArgsConstructor
 public class SecurityConfig{
     @Autowired

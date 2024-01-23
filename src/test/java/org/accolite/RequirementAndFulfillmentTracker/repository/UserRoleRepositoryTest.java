@@ -27,10 +27,9 @@ class UserRoleRepositoryTest {
     public void saveUserRoleWithAccount() {
 
         UserRole userRole = UserRole.builder()
-                .id(2)
-                .emailId("simran.ali@accolitedigital.com")
-                .employeeId(7489)
-                .role(Role.ADMIN)
+                .emailId("raft.user.from@gmail.com")
+                .employeeId(7462)
+                .role(Role.BENCH_MANAGER)
                 .build();
 
         Account account = accountRepository.findById(2L).orElse(null);
