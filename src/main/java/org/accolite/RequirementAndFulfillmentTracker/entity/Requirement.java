@@ -34,10 +34,6 @@ public class Requirement {
     )
     private Account account;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "skillId")
-    private Set<Skill> skills = new HashSet<>();
-
     public Long getRequirementId() {
         return requirementId;
     }

@@ -11,13 +11,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
+// adding enable web mvc
+@EnableWebMvc
 @EnableWebSecurity
+@EnableSwagger2
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig{
     @Autowired
     private JWTAuthenticationFilter jwtAuthFilter;
 
@@ -31,7 +37,7 @@ public class SecurityConfig {
 //                .cors(cors -> cors.disable())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                    req.requestMatchers("/api/auth/createUser")
+                    req.requestMatchers("/api/auth/createUser", "/v3/api-docs")
 
                                 .permitAll()
                                 .anyRequest()
@@ -43,4 +49,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }
