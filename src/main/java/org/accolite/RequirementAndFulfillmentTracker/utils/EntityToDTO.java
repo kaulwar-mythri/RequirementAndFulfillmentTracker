@@ -31,8 +31,8 @@ public class EntityToDTO {
         return BenchCandidateDTO.builder()
                 .id(candidate.getId())
                 .candidateName(candidate.getCandidateName())
-                .benchCandidateSkills(candidate.getBenchCandidateSkills())
                 .candidateStatus(candidate.getStatus())
+                .benchCandidateSkills(candidate.getCandidate_skill_description())
                 .benchManager(getUserRoleDTO(candidate.getBenchManager()))
                 .benchPeriod(candidate.getBenchPeriod())
                 .build();
@@ -44,6 +44,7 @@ public class EntityToDTO {
                 .requirementId(requirement.getRequirementId())
                 .account(requirement_accountDTO)
                 .requiredNo(requirement.getRequiredNo())
+                .fulfilledNo(requirement.getFulfilledNo())
                 .startDate(requirement.getStartDate())
                 .endDate(requirement.getEndDate())
                 .jobDescription(requirement.getJob_description())

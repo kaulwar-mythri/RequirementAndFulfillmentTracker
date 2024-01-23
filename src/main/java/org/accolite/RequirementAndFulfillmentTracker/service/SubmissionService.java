@@ -13,8 +13,6 @@ public interface SubmissionService {
 
     ResponseEntity<List<SubmissionDTO>> getAllSubmissions();
 
-    ResponseEntity<SubmissionDTO> getSubmissionById(Long id);
-
      ResponseEntity<SubmissionDTO> updateSubmission(Long id, SubmissionDTO updatedSubmission);
 
     void deleteSubmission(Long id);

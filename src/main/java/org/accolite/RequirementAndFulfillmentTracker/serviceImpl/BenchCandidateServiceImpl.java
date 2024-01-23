@@ -48,7 +48,6 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
             UserRole benchManager = userRoleRepository.findById(candidate.getBenchManager().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench manager not found exception"));
             BenchCandidate newCandidate = BenchCandidate.builder()
                     .candidateName(candidate.getCandidateName())
-                    .benchCandidateSkills(candidate.getBenchCandidateSkills())
                     .benchManager(benchManager)
                     .benchPeriod(candidate.getBenchPeriod())
                     .status(candidate.getCandidateStatus())
@@ -70,15 +69,6 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
         }).toList();
 
         return benchCandidatesList.stream().map(candidate -> entityToDTO.getBenchCandidateDTO(candidate)).collect(Collectors.toList());
-    }
-
-    @Override
-    public ResponseEntity<BenchCandidateDTO> getCandidateById(Long id) {
-
-        BenchCandidate benchCandidate = benchCandidateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bench candidate not found"));
-
-        BenchCandidateDTO benchCandidateDTO = entityToDTO.getBenchCandidateDTO(benchCandidate);
-        return ResponseEntity.ok(benchCandidateDTO);
     }
 
     @Override

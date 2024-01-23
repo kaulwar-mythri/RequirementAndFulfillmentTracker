@@ -28,11 +28,6 @@ public class SubmissionsController {
         return submissionsService.getAllSubmissions();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SubmissionDTO> getSubmissionById(@PathVariable Long id) {
-        return submissionsService.getSubmissionById(id);
-    }
-
     @PutMapping("/{id}/update")
 
     public ResponseEntity<SubmissionDTO> updateSubmission(@PathVariable Long id, @RequestBody SubmissionDTO updatedSubmission) {

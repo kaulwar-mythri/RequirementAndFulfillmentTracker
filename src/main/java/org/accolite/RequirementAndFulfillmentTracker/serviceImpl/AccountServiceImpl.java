@@ -50,12 +50,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountById(long id) {
-        Account account =accountRepository.findById(id).orElse(null);
-        return account;
-    }
-
-    @Override
     public ResponseEntity<String> deleteAccountById(long id) {
         accountRepository.deleteById(id);
         return ResponseEntity.ok("Account deleted");

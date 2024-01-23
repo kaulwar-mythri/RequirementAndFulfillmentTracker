@@ -12,8 +12,6 @@ public interface BenchCandidateService {
 
     List<BenchCandidateDTO> getAllCandidates();
 
-    ResponseEntity<BenchCandidateDTO> getCandidateById(Long id);
-
     ResponseEntity<BenchCandidateDTO> updateCandidate(Long id, BenchCandidateDTO updatedCandidate);
 
     ResponseEntity<String> deleteCandidate(Long id);
