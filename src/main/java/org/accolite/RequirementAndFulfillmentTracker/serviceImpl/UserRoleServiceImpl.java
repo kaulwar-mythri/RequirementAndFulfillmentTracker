@@ -1,24 +1,35 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
+import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
+import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.UserRoleService;
+import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserRoleServiceImpl implements UserRoleService {
     @Autowired
     UserRoleRepository userRoleRepository;
+    @Autowired
+    EntityToDTO entityToDTO;
+    @Autowired
+    AccountRepository accountRepository;
 //    @Override
 //    public ResponseEntity<String> createUserRole(UserRole userRole) {
 //        userRole.setRole(Role.DEFAULT);
@@ -28,29 +39,35 @@ public class UserRoleServiceImpl implements UserRoleService {
 //    }
 
     @Override
-    public List<UserRole> getAllUsers() {
-        return userRoleRepository.findAll();
+    public ResponseEntity<List<UserRoleDTO>> getAllUsers() {
+        return ResponseEntity.ok(userRoleRepository.findAll().stream().map(userRole -> {
+            return entityToDTO.getUserRoleDTO(userRole);
+        }).toList());
     }
 
     @Override
-    public UserRole getUserById(long id) {
-        return userRoleRepository.findById(id).orElse(null);
+    public ResponseEntity<UserRoleDTO> getUserById(long id) {
+        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRoleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with given id not found"))));
     }
 
     @Override
-    public UserRole updateUser(long id, UserRole updatedUserRole) {
-        Optional<UserRole> existingUserRole = userRoleRepository.findById(id);
+    public ResponseEntity<UserRoleDTO> updateUser(long id, UserRoleDTO updatedUserRole) {
+        UserRole existingUserRole = userRoleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (existingUserRole.isPresent()) {
-            UserRole userRole = existingUserRole.get();
-            userRole.setAccounts(updatedUserRole.getAccounts());
-            userRole.setRole(updatedUserRole.getRole());
-            userRole.setEmailId(updatedUserRole.getEmailId());
-            return userRoleRepository.save(userRole);
-        } else {
-            //return ResponseEntity.badRequest().body("User Role not found");
-            return null;
-        }
+        Set<Account> userAccounts = updatedUserRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id()).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
+
+        existingUserRole.setAccounts(userAccounts);
+        existingUserRole.setRole(updatedUserRole.getRole());
+        existingUserRole.setEmailId(updatedUserRole.getEmailId());
+        existingUserRole.setEmployeeId(updatedUserRole.getEmployeeId());
+        existingUserRole.setName(updatedUserRole.getName());
+        existingUserRole = userRoleRepository.save(existingUserRole);
+
+        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(existingUserRole));
     }
 
     @Override

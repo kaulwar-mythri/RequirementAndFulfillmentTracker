@@ -1,6 +1,7 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
+import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +21,18 @@ public class AccountController {
     AccountService accountService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createAccount(@RequestBody Account account) {
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO account) {
         return accountService.createAccount(account);
     }
 
     @PutMapping("/{id}/update")
-    public Account updateAccount(@PathVariable long id, @RequestBody Account updatedAccount) {
+    public ResponseEntity<AccountDTO> updateAccount(@PathVariable long id, @RequestBody AccountDTO updatedAccount) {
         return accountService.updateAccount(id, updatedAccount);
     }
 
     // Get All Accounts
     @GetMapping("/all")
-    public List<Account> getAllAccounts() {
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
         return accountService.getAllAccounts();
     }
 

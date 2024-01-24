@@ -122,6 +122,9 @@ public class FulfillmentServiceImpl implements FulfillmentService {
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
 
+        if(user.getRole() == Role.SUPER_ADMIN)
+            return;
+
         Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
             return accountRepository.findById(accountDTO.getAccount_id())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found"));

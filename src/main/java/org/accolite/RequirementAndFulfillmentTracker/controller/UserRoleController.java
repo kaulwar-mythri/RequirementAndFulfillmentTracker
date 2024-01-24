@@ -16,17 +16,18 @@ public class UserRoleController {
     @Autowired
     UserRoleService userRoleService;
 
-    @GetMapping("/")
-    public List<UserRole> getAllUsers() {
+    @GetMapping("/all")
+    public ResponseEntity<List<UserRoleDTO>> getAllUsers() {
+        System.out.println("hello from getAllUsers");
         return userRoleService.getAllUsers();
     }
     @GetMapping("/{id}")
-    public UserRole getUserById(@PathVariable long id) {
+    public ResponseEntity<UserRoleDTO> getUserById(@PathVariable long id) {
         return userRoleService.getUserById(id);
     }
 
     @PutMapping("/{id}/update")
-    public UserRole updateUser(@PathVariable long id, @RequestBody UserRole updatedUserRole) {
+    public ResponseEntity<UserRoleDTO> updateUser(@PathVariable long id, @RequestBody UserRoleDTO updatedUserRole) {
         return userRoleService.updateUser(id, updatedUserRole);
     }
 

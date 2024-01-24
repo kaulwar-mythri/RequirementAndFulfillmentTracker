@@ -145,7 +145,7 @@ public class RequirementServiceImpl implements RequirementService {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
     }
-    
+
     @Override
     public void deleteRequirement(Long id) {
         Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
@@ -220,8 +220,6 @@ public class RequirementServiceImpl implements RequirementService {
         // You can perform actions like notifying the hiring manager or updating the database
     }
 
-    //requirement_account is
-    // this is wrong, the second condition is giving false
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
 
@@ -229,6 +227,9 @@ public class RequirementServiceImpl implements RequirementService {
             return accountRepository.findById(accountDTO.getAccount_id())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
         }).collect(Collectors.toSet());
+
+        if(user.getRole() == Role.SUPER_ADMIN)
+            return;
 
         Account requirementAccount = accountRepository.findById(requirement_accountDTO.getAccount_id())
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
