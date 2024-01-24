@@ -11,7 +11,6 @@ import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,12 +57,12 @@ public class FulfillmentServiceImpl implements FulfillmentService {
 
     }
 
+
     @Override
     public ResponseEntity<List<FulfillmentDTO>> getAllFulfillments() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found")));
-
-        Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
+          Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
         if(user_role == Role.ADMIN || user_role == Role.SUPER_ADMIN) {
             return ResponseEntity.ok(fulfillmentRepository.findAll().stream().map(fulfillment -> {
                 return entityToDTO.getFulfillmentDTO(fulfillment);
@@ -121,6 +120,9 @@ public class FulfillmentServiceImpl implements FulfillmentService {
 
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+
+        if(user.getRole() == Role.SUPER_ADMIN)
+            return;
 
         Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
             return accountRepository.findById(accountDTO.getAccount_id())

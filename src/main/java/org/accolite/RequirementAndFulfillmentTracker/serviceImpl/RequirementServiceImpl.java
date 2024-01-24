@@ -1,7 +1,6 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import jakarta.mail.MessagingException;
-import jakarta.persistence.EntityNotFoundException;
 import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
 import org.accolite.RequirementAndFulfillmentTracker.entity.*;
 import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
@@ -23,7 +22,6 @@ import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -86,7 +84,7 @@ public class RequirementServiceImpl implements RequirementService {
 
 
     }
-
+// first time
 //    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
 //        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
 //            return entityToDTO.getRequirementDTO(requirement);
@@ -109,16 +107,37 @@ public class RequirementServiceImpl implements RequirementService {
 //        return ResponseEntity.ok(requirementDTOS);
 //    }
 
+// second time
+//    @Override
+//    public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
+//        UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
+//                .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
+//        //user_accounts -> storing all accounts of least level
+//        Set<AccountDTO> user_accounts = userRole.getAccounts();
+//
+//        List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
+//            return entityToDTO.getRequirementDTO(requirement);
+//        }).filter(requirementDTO -> {
+//            AccountDTO
+//                    requirementAccount = entityToDTO.getAccountDTO(accountRepository.findById(requirementDTO.getAccount().getAccount_id())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Account not found")));
+//            if(requirementAccount.getHierarchyTag() == HierarchyTag.BUSINESS_UNIT && user_accounts.contains(requirementAccount))
+//                return true;
+//            else if(requirementAccount.getHierarchyTag() == HierarchyTag.CLIENT && (user_accounts.contains(requirementAccount) || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))))
+//                return true;
+//            else return requirementAccount.getHierarchyTag() == HierarchyTag.DEPARTMENT &&
+//                        (user_accounts.contains(requirementAccount)
+//                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(requirementAccount.getParentId()).orElse(null)))
+//                                || user_accounts.contains(entityToDTO.getAccountDTO(accountRepository.findById(accountRepository.findById(requirementAccount.getParentId()).orElse(null).getParentId()).orElse(null))));
+//        }).collect(Collectors.toList());
+//        return ResponseEntity.ok(requirementDTOS);
+//    }
+
 
     @Override
     public ResponseEntity<List<RequirementDTO>> getAllRequirements() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
                 .orElseThrow(() -> new ResourceNotFoundException("User nt found")));
-        //user_accounts -> storing all accounts of least level
-        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
-            return accountRepository.findById(accountDTO.getAccount_id())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
-        }).collect(Collectors.toSet());
 
         Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElseThrow(() -> new ResourceNotFoundException("User Not found")).getRole();
         if(user_role == Role.ADMIN || user_role == Role.SUPER_ADMIN) {
@@ -126,6 +145,12 @@ public class RequirementServiceImpl implements RequirementService {
                 return entityToDTO.getRequirementDTO(requirement);
             }).toList());
         }
+        //user_accounts -> storing all accounts of least level
+        Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
+            return accountRepository.findById(accountDTO.getAccount_id())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+        }).collect(Collectors.toSet());
+
         List<RequirementDTO> requirementDTOS =  requirementsRepository.findAll().stream().map(requirement -> {
             return entityToDTO.getRequirementDTO(requirement);
         }).filter(requirementDTO -> {
@@ -145,12 +170,6 @@ public class RequirementServiceImpl implements RequirementService {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
     }
-
-
-
-
-
-
 
     @Override
     public ResponseEntity<RequirementDTO> getRequirementById(Long id) {
@@ -233,10 +252,11 @@ public class RequirementServiceImpl implements RequirementService {
         // You can perform actions like notifying the hiring manager or updating the database
     }
 
-    //requirement_account is
-    // this is wrong, the second condition is giving false
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+
+        if(user.getRole() == Role.SUPER_ADMIN)
+            return;
 
         Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
             return accountRepository.findById(accountDTO.getAccount_id())

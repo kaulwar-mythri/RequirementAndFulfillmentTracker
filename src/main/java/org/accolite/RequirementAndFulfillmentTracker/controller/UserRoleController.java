@@ -16,23 +16,24 @@ public class UserRoleController {
     @Autowired
     UserRoleService userRoleService;
 
-    @GetMapping("/")
-    public List<UserRole> getAllUsers() {
+    @GetMapping("/all")
+    public ResponseEntity<List<UserRoleDTO>> getAllUsers() {
+        System.out.println("hello from getAllUsers");
         return userRoleService.getAllUsers();
     }
-    @GetMapping("/{id}")
-    public UserRole getUserById(@PathVariable long id) {
-        return userRoleService.getUserById(id);
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<UserRoleDTO> getUserByEmployeeId(@PathVariable long employeeId) {
+        return userRoleService.getUserByEmployeeId(employeeId);
     }
 
-    @PutMapping("/{id}/update")
-    public UserRole updateUser(@PathVariable long id, @RequestBody UserRole updatedUserRole) {
-        return userRoleService.updateUser(id, updatedUserRole);
+    @PutMapping("/{employeeId}/update")
+    public ResponseEntity<UserRoleDTO> updateUser(@PathVariable long employeeId, @RequestBody UserRoleDTO updatedUserRole) {
+        return userRoleService.updateUser(employeeId, updatedUserRole);
     }
 
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteUserById(@PathVariable long id) {
-        return userRoleService.deleteUserById(id);
+    @DeleteMapping("/{employeeId}/delete")
+    public ResponseEntity<String> deleteUserByEmployeeId(@PathVariable long employeeId) {
+        return userRoleService.deleteUserByEmployeeId(employeeId);
     }
 
     @PostMapping("/requestAccess")

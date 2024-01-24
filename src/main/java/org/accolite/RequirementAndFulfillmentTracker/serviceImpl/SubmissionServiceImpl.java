@@ -71,6 +71,15 @@ public class SubmissionServiceImpl implements SubmissionService {
         benchCandidateRepository.save(benchCandidate);
     }
 
+//    @Override
+//    public ResponseEntity<List<SubmissionDTO>> getAllSubmissions() {
+//         List<SubmissionDTO> submissionDTOList = submissionRepository.findAll().stream().map(submission -> {
+//            return entityToDTO.getSubmissionDTO(submission);
+//        }).collect(Collectors.toList());
+//
+//         return ResponseEntity.ok(submissionDTOList);
+//    }
+
     @Override
     public ResponseEntity<List<SubmissionDTO>> getAllSubmissions() {
         UserRoleDTO userRole = entityToDTO.getUserRoleDTO(userRoleRepository.findByEmailId(jwtService.getUser())
@@ -82,7 +91,6 @@ public class SubmissionServiceImpl implements SubmissionService {
                 return entityToDTO.getSubmissionDTO(submission);
             }).toList());
         }
-
         //user_accounts -> storing all accounts of least level
         Set<Account> user_accounts = userRole.getAccounts().stream().map(accountDTO -> {
             return accountRepository.findById(accountDTO.getAccount_id())
@@ -139,9 +147,11 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         submissionRepository.deleteById(id);
     }
-
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+
+        if(user.getRole() == Role.SUPER_ADMIN)
+            return;
 
         Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
             return accountRepository.findById(accountDTO.getAccount_id())

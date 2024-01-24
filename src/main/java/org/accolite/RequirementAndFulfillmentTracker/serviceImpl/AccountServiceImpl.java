@@ -2,9 +2,12 @@ package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
+import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.AccountService;
+import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,34 +22,38 @@ import java.util.Set;
 public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
-    @Override
-    public ResponseEntity<String> createAccount(Account account) {
-        accountRepository.save(account);
-        return ResponseEntity.ok("Account created");
-    }
-
+    @Autowired
+    EntityToDTO entityToDTO;
     @Autowired
     UserRoleRepository userRoleRepository;
     @Override
-    public Account updateAccount(long id, Account updatedAccount) {
-        Optional<Account> existingAccount = accountRepository.findById(id);
+    public ResponseEntity<AccountDTO> createAccount(AccountDTO account) {
+        Account newAccount = Account.builder()
+                .name(account.getName())
+                .parentId(account.getParentId())
+                .hierarchyTag(account.getHierarchyTag())
+                .build();
+        newAccount = accountRepository.save(newAccount);
+        return ResponseEntity.ok(entityToDTO.getAccountDTO(newAccount));
+    }
+    @Override
+    public ResponseEntity<AccountDTO> updateAccount(long id, AccountDTO updatedAccount) {
+        Account existingAccount = accountRepository.findById(updatedAccount.getAccount_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
-        if (existingAccount.isPresent()) {
-            Account account = existingAccount.get();
-            account.setName(updatedAccount.getName());
-            account.setParentId(updatedAccount.getParentId());
-            account.setUserRoles(updatedAccount.getUserRoles());
-            account.setHierarchyTag(updatedAccount.getHierarchyTag());
-            return accountRepository.save(account);
-        } else {
-            return null;
-            //return ResponseEntity.badRequest().body("Account not found");
-        }
+        existingAccount.setName(updatedAccount.getName());
+        existingAccount.setParentId(updatedAccount.getParentId());
+        existingAccount.setHierarchyTag(updatedAccount.getHierarchyTag());
+        existingAccount = accountRepository.save(existingAccount);
+
+        return ResponseEntity.ok(entityToDTO.getAccountDTO(existingAccount));
     }
 
     @Override
-    public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
+        return ResponseEntity.ok(accountRepository.findAll().stream().map(account -> {
+            return entityToDTO.getAccountDTO(account);
+        }).toList());
     }
 
     @Override

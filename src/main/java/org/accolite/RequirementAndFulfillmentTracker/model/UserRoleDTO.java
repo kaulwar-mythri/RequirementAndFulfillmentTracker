@@ -13,7 +13,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserRoleDTO {
     long id;
-    long employeeId;
+    String employeeId;
+    String name;
     String emailId;
     Role role;
     Set<AccountDTO> accounts = new HashSet<>();

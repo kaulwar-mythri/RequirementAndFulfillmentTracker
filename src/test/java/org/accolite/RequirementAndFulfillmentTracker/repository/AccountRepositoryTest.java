@@ -21,7 +21,7 @@ class AccountRepositoryTest {
     public void addAccount() {
         Account account = Account.builder()
                 .name("BFS")
-                .hierarchyTag(HierarchyTag.CLIENT)
+                .hierarchyTag(HierarchyTag.BUSINESS_UNIT)
                 .parentId(0)
                 .build();
 

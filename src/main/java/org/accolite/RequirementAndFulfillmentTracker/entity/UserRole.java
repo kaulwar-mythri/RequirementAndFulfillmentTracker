@@ -23,7 +23,7 @@ public class UserRole implements UserDetails{
     @GeneratedValue(strategy = GenerationType.AUTO)
     long id;
 
-    long employeeId;
+    String employeeId;
 
 
     @Enumerated(EnumType.STRING)
@@ -35,46 +35,6 @@ public class UserRole implements UserDetails{
 
     String emailId;
     String name;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(long employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public Set<Account> getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(Set<Account> accounts) {
-        this.accounts = accounts;
-    }
-
-    public String getEmailId() {
-        return emailId;
-    }
-
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

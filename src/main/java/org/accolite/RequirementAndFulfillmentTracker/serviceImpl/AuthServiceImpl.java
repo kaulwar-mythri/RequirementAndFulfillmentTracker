@@ -73,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
             if(userRole == null) {
                 var newUserRole = UserRole.builder()
+                        .name(response.getBody().getName())
                         .emailId(response.getBody().getEmail())
                         .role(Role.DEFAULT)
                         .accounts(new HashSet<>())
