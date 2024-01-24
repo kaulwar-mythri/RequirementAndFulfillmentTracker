@@ -49,12 +49,13 @@ class UserRoleRepositoryTest {
         UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
 
         Account account = Account.builder()
-                .name("DFA")
-                .hierarchyTag(HierarchyTag.DEPARTMENT)
-                .parentId(2)
+                .name("Morgan Stanley")
+                .hierarchyTag(HierarchyTag.CLIENT)
+                .parentId(1)
                 .build();
 
-        Set<Account> accountSet = new HashSet<>();
+        Set<Account> accountSet = userRole.getAccounts();
+        if(accountSet == null) accountSet = new HashSet<>();
         accountSet.add(account);
 
         userRole.setAccounts(accountSet);

@@ -57,6 +57,8 @@ public class EntityToDTO {
 
         return UserRoleDTO.builder()
                 .id(userRole.getId())
+                .name(userRole.getName())
+                .employeeId(userRole.getEmployeeId())
                 .role(userRole.getRole())
                 .emailId(userRole.getEmailId())
                 .accounts(accountDTOS)

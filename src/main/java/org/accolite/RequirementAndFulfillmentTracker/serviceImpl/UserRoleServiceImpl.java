@@ -46,14 +46,14 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public ResponseEntity<UserRoleDTO> getUserById(long id) {
-        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRoleRepository.findById(id)
+    public ResponseEntity<UserRoleDTO> getUserByEmployeeId(long employeeId) {
+        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRoleRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with given id not found"))));
     }
 
     @Override
-    public ResponseEntity<UserRoleDTO> updateUser(long id, UserRoleDTO updatedUserRole) {
-        UserRole existingUserRole = userRoleRepository.findById(id)
+    public ResponseEntity<UserRoleDTO> updateUser(long employeeId, UserRoleDTO updatedUserRole) {
+        UserRole existingUserRole = userRoleRepository.findByEmployeeId(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Set<Account> userAccounts = updatedUserRole.getAccounts().stream().map(accountDTO -> {
@@ -71,8 +71,8 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public ResponseEntity<String> deleteUserById(long id) {
-        userRoleRepository.deleteById(id);
+    public ResponseEntity<String> deleteUserByEmployeeId(long employeeId) {
+        userRoleRepository.deleteById(employeeId);
         return ResponseEntity.ok("User deleted");
     }
 
