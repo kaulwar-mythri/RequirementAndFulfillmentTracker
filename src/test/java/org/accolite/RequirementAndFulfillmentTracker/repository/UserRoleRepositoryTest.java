@@ -4,6 +4,9 @@ import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.HierarchyTag;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
+import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
+import org.hibernate.annotations.NaturalId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,8 @@ class UserRoleRepositoryTest {
 
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    EntityToDTO entityToDTO;
 
     @Test
     public void saveUserRoleWithAccount() {
@@ -32,32 +37,42 @@ class UserRoleRepositoryTest {
                 .role(Role.BENCH_MANAGER)
                 .build();
 
-        Account account = accountRepository.findById(2L).orElse(null);
+        Account account = accountRepository.findById(1L).orElseThrow(() -> new ResourceNotFoundException("Account not found"));;
+//        System.out.println(accountRepository.findAll());
+//        Set<Account> accountSet = new HashSet<>();
+//        accountSet.add(account);
+//
+//        userRole.setAccounts(accountSet);
 
-        Set<Account> accountSet = new HashSet<>();
-        accountSet.add(account);
 
-        userRole.setAccounts(accountSet);
-
-
-        userRoleRepository.save(userRole);
+        System.out.println(userRoleRepository.save(userRole));
     }
 
 
     @Test
     public void saveUserRoles(){
-        UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
+        UserRole userRole = userRoleRepository.findByEmailId("raft.user.from@gmail.com").orElse(null);
 
-        Account account = Account.builder()
-                .name("DFA")
-                .hierarchyTag(HierarchyTag.DEPARTMENT)
-                .parentId(2)
-                .build();
+//        Account account = Account.builder()
+//                .name("GS")
+//                .hierarchyTag(HierarchyTag.DEPARTMENT)
+//                .parentId(2)
+//                .build();
 
+        Account account = accountRepository.findById(2L).orElseThrow(() -> new ResourceNotFoundException("Account not found"));;
+        System.out.println(accountRepository.findAll());
         Set<Account> accountSet = new HashSet<>();
         accountSet.add(account);
 
         userRole.setAccounts(accountSet);
+
+
+        System.out.println(userRoleRepository.save(userRole));
+//
+//        Set<Account> accountSet = new HashSet<>();
+//        accountSet.add(account);
+//
+//        userRole.setAccounts(accountSet);
 
 //        userRoleRepository.save(userRole);
 //        UserRole benchmanager = UserRole.builder()
@@ -67,7 +82,7 @@ class UserRoleRepositoryTest {
 //                .build();
 //        Set<UserRole> userRoles = new HashSet<>();
 //        userRoles.add(userRole);
-        userRoleRepository.save(userRole);
+//        userRoleRepository.save(userRole);
     }
 
 //    @Test
