@@ -24,18 +24,19 @@ public class BenchCandidate {
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
-    private Set<Skill> skill = new HashSet<>();
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinColumn(name = "bench_candidate_id") // Name of the foreign key column
+//    private Set<Skill> skill = new HashSet<>();
+    private String skill;
 
     private int benchPeriod;
 
-    // shouldn't this be mapped to userrole ??
+
     @ManyToOne
     @JoinColumn(
-            name="user-role_id",
+            name="userRole_id",
             referencedColumnName = "id"
     )
-    // replaced benchManagerId with Userrole attribute
+
     private UserRole benchManager;
 }
