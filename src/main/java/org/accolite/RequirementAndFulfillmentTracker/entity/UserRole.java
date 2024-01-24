@@ -23,7 +23,7 @@ public class UserRole implements UserDetails{
     @GeneratedValue(strategy = GenerationType.AUTO)
     long id;
 
-    String employeeId;
+    long employeeId;
 
 
     @Enumerated(EnumType.STRING)

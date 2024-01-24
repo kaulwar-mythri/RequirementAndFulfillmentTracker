@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserRoleDTO {
     long id;
-    String employeeId;
+    long employeeId;
     String name;
     String emailId;
     Role role;

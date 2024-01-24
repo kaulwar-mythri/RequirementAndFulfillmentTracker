@@ -1,9 +1,11 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
+import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
 import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
+import org.accolite.RequirementAndFulfillmentTracker.exception.UserUnauthorisedException;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.AccountRepository;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
@@ -16,10 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +29,9 @@ public class UserRoleServiceImpl implements UserRoleService {
     EntityToDTO entityToDTO;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    JWTService jwtService;
+    List<Role> authorised_roles = new ArrayList<>(List.of(Role.SUPER_ADMIN));
 //    @Override
 //    public ResponseEntity<String> createUserRole(UserRole userRole) {
 //        userRole.setRole(Role.DEFAULT);
@@ -40,6 +42,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public ResponseEntity<List<UserRoleDTO>> getAllUsers() {
+        checkIfAuthorized();
         return ResponseEntity.ok(userRoleRepository.findAll().stream().map(userRole -> {
             return entityToDTO.getUserRoleDTO(userRole);
         }).toList());
@@ -47,12 +50,14 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public ResponseEntity<UserRoleDTO> getUserByEmployeeId(long employeeId) {
+        checkIfAuthorized();
         return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRoleRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with given id not found"))));
     }
 
     @Override
     public ResponseEntity<UserRoleDTO> updateUser(long employeeId, UserRoleDTO updatedUserRole) {
+        checkIfAuthorized();
         UserRole existingUserRole = userRoleRepository.findByEmployeeId(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -72,15 +77,9 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public ResponseEntity<String> deleteUserByEmployeeId(long employeeId) {
+        checkIfAuthorized();
         userRoleRepository.deleteById(employeeId);
         return ResponseEntity.ok("User deleted");
-    }
-
-    @Override
-    public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO) {
-        //send alert to admin
-
-        return ResponseEntity.ok("Requested Access");
     }
 
     @Override
@@ -89,5 +88,13 @@ public class UserRoleServiceImpl implements UserRoleService {
         System.out.println(authentication.getAuthorities());
 
         return ResponseEntity.ok(authentication.getName());
+    }
+
+    private void checkIfAuthorized() {
+        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if(!authorised_roles.contains(user.getRole()))
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
     }
 }

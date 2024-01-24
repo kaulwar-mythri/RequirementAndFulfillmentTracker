@@ -14,8 +14,5 @@ public interface UserRoleService {
     // Update User
     public ResponseEntity<UserRoleDTO> updateUser(long employeeId, UserRoleDTO updatedUserRole);
     public ResponseEntity<String> deleteUserByEmployeeId(long employeeId);
-
-    public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO);
-
     public ResponseEntity<String> getUser();
 }
