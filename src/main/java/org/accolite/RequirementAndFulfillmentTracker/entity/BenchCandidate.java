@@ -22,7 +22,7 @@ public class BenchCandidate {
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
-    private String candidate_skill_description;
+    private String benchCandidateSkills;
     private int benchPeriod;
     //start-date and end-date
 

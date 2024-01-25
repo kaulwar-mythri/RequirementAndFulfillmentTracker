@@ -32,7 +32,7 @@ public class EntityToDTO {
                 .id(candidate.getId())
                 .candidateName(candidate.getCandidateName())
                 .candidateStatus(candidate.getStatus())
-                .benchCandidateSkills(candidate.getCandidate_skill_description())
+                .benchCandidateSkills(candidate.getBenchCandidateSkills())
                 .benchManager(getUserRoleDTO(candidate.getBenchManager()))
                 .benchPeriod(candidate.getBenchPeriod())
                 .build();

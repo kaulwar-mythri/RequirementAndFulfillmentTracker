@@ -6,10 +6,12 @@ import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
 import org.accolite.RequirementAndFulfillmentTracker.entity.GoogleTokenPayload;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
 import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.AuthService;
+import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,8 @@ public class AuthServiceImpl implements AuthService {
     JWTService jwtService;
     @Autowired
     UserRoleRepository userRoleRepository;
+    @Autowired
+    EntityToDTO entityToDTO;
     private String validationEndpoint = "https://www.googleapis.com/oauth2/v3/tokeninfo";
     private boolean isNewUser = false;
     @Override
@@ -94,10 +98,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<String> getUser() {
+    public ResponseEntity<UserRoleDTO> getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication.getName());
 
-        return ResponseEntity.ok(authentication.getName());
+        UserRole userRole = userRoleRepository.findByEmailId(authentication.getName()).orElseThrow(() -> new ResourceNotFoundException("User with emailId not found"));
+        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRole));
     }
 }

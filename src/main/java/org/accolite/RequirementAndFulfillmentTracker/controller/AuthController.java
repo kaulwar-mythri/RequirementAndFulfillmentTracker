@@ -25,7 +25,7 @@ public class AuthController {
     }
 
     @GetMapping("/getUser")
-    public ResponseEntity<String> getUser() {
+    public ResponseEntity<UserRoleDTO> getUser() {
         return authService.getUser();
     }
 }

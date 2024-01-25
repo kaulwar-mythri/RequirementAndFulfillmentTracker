@@ -11,5 +11,5 @@ import java.util.Set;
 public interface AuthService {
     public ResponseEntity<Map<String, Object>> createUserRole(String googleAuthToken);
 
-    public ResponseEntity<String> getUser();
+    public ResponseEntity<UserRoleDTO> getUser();
 }
