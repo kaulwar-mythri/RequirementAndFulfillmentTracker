@@ -16,5 +16,5 @@ public interface FulfillmentService {
 
     ResponseEntity<FulfillmentDTO> updateFulfillment(Long fulfillmentID, FulfillmentDTO updatedFulfillment);
 
-    void deleteFulfillment(@PathVariable Long fulfillmentId);
+//    void deleteFulfillment(@PathVariable Long fulfillmentId);
 }

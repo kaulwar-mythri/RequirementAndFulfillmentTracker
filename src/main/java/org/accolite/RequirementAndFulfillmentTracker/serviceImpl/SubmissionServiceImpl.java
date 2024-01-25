@@ -49,7 +49,7 @@ public class SubmissionServiceImpl implements SubmissionService {
          * */
         Requirement requirement = requirementRepository.findById(submission.getRequirement().getRequirementId()).orElseThrow(() -> new ResourceNotFoundException("Requirement with given id not found"));
         BenchCandidate benchCandidate = benchCandidateRepository.findById(submission.getBenchCandidate().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench candidate with given id not found"));
-        if(benchCandidate.getStatus() == CandidateStatus.HOLD || benchCandidate.getStatus() == CandidateStatus.SELECTED) throw new ResourceInUseException("Candidate with given id was either submitted for another client interview or selected by another client");
+        if(benchCandidate.getCandidateStatus() == CandidateStatus.HOLD || benchCandidate.getCandidateStatus() == CandidateStatus.SELECTED) throw new ResourceInUseException("Candidate with given id was either submitted for another client interview or selected by another client");
 
         Submission newSubmission = Submission.builder()
                 .submissionDate(submission.getSubmissionDate())
@@ -60,14 +60,14 @@ public class SubmissionServiceImpl implements SubmissionService {
                 .build();
         newSubmission = submissionRepository.save(newSubmission);
 
-        benchCandidate.setStatus(CandidateStatus.HOLD); benchCandidateRepository.save(benchCandidate);
+        benchCandidate.setCandidateStatus(CandidateStatus.HOLD); benchCandidateRepository.save(benchCandidate);
         return ResponseEntity.ok(entityToDTO.getSubmissionDTO(newSubmission));
     }
 
     // update the candidate status if they are selected, bench manager can then update the status accordingly
     // for eg if bg check is going on or onboarding
     public void updateCandidateStatusIfSelected(BenchCandidate benchCandidate){
-        benchCandidate.setStatus(CandidateStatus.SELECTED);
+        benchCandidate.setCandidateStatus(CandidateStatus.SELECTED);
         benchCandidateRepository.save(benchCandidate);
     }
 
@@ -136,17 +136,17 @@ public class SubmissionServiceImpl implements SubmissionService {
         return ResponseEntity.ok(entityToDTO.getSubmissionDTO(existingSubmission));
     }
 
-    @Override
-    public void deleteSubmission(Long id) {
-        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Submission with given id not found"));
-        AccountDTO accountDTO = entityToDTO.getAccountDTO(submission.getRequirement().getAccount());
-        checkIfAuthorized(accountDTO);
-        // foreign key not set null hence not working
-        submission.setBenchCandidate(null);
-        submission.setRequirement(null);
-
-        submissionRepository.deleteById(id);
-    }
+//    @Override
+//    public void deleteSubmission(Long id) {
+//        Submission submission = submissionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Submission with given id not found"));
+//        AccountDTO accountDTO = entityToDTO.getAccountDTO(submission.getRequirement().getAccount());
+//        checkIfAuthorized(accountDTO);
+//        // foreign key not set null hence not working
+//        submission.setBenchCandidate(null);
+//        submission.setRequirement(null);
+//
+//        submissionRepository.deleteById(id);
+//    }
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
 

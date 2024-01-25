@@ -35,8 +35,8 @@ public class FulfillmentController {
         return fulfillmentService.getAllFulfillments();
     }
 
-    @DeleteMapping("/{fulfillmentId}/delete")
-    public void deleteFulfillment(@PathVariable Long fulfillmentId) {
-        fulfillmentService.deleteFulfillment(fulfillmentId);
-    }
+//    @DeleteMapping("/{fulfillmentId}/delete")
+//    public void deleteFulfillment(@PathVariable Long fulfillmentId) {
+//        fulfillmentService.deleteFulfillment(fulfillmentId);
+//    }
 }

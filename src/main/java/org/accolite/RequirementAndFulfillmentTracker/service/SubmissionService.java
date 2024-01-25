@@ -15,5 +15,5 @@ public interface SubmissionService {
 
      ResponseEntity<SubmissionDTO> updateSubmission(Long id, SubmissionDTO updatedSubmission);
 
-    void deleteSubmission(Long id);
+//    void deleteSubmission(Long id);
 }

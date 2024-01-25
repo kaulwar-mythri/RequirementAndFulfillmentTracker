@@ -16,6 +16,7 @@ public class BenchCandidateDTO {
     CandidateStatus candidateStatus;
     String candidateName;
     String benchCandidateSkills;
-    int benchPeriod;
     UserRoleDTO benchManager;
+    String startDate;
+    String endDate;
 }

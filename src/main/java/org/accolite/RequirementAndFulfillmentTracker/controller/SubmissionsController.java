@@ -34,9 +34,9 @@ public class SubmissionsController {
         return submissionsService.updateSubmission(id, updatedSubmission);
     }
     // not working
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteSubmission(@PathVariable Long id) {
-        submissionsService.deleteSubmission(id);
-        return ResponseEntity.ok("Successfully deleted submission");
-    }
+//    @DeleteMapping("/{id}/delete")
+//    public ResponseEntity<String> deleteSubmission(@PathVariable Long id) {
+//        submissionsService.deleteSubmission(id);
+//        return ResponseEntity.ok("Successfully deleted submission");
+//    }
 }

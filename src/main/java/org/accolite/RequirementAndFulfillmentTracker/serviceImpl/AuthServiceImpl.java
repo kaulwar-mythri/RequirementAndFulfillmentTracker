@@ -64,6 +64,14 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public ResponseEntity<UserRoleDTO> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserRole userRole = userRoleRepository.findByEmailId(authentication.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRole));
+    }
+
     private String validateGoogleToken(String googleAuthToken) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<GoogleTokenPayload> response = restTemplate.getForEntity(validationEndpoint + "?id_token=" + googleAuthToken, GoogleTokenPayload.class);
@@ -97,12 +105,4 @@ public class AuthServiceImpl implements AuthService {
             return null;
     }
 
-    @Override
-    public ResponseEntity<UserRoleDTO> getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getName());
-
-        UserRole userRole = userRoleRepository.findByEmailId(authentication.getName()).orElseThrow(() -> new ResourceNotFoundException("User with emailId not found"));
-        return ResponseEntity.ok(entityToDTO.getUserRoleDTO(userRole));
-    }
 }

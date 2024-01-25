@@ -17,7 +17,7 @@ public interface RequirementService {
 
     ResponseEntity<RequirementDTO> getRequirementById(Long id);
 
-    void deleteRequirement(Long id);
+//    void deleteRequirement(Long id);
     void alertBench(Long benchManagerId, Set<Long> requirementIds) throws MessagingException;
     void alertHiring(Long hiringManagerId, Set<Long> requirementIds);
 
