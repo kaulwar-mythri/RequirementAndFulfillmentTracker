@@ -21,9 +21,10 @@ public class BenchCandidate {
     private String candidateName;
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
-    private CandidateStatus status;
-    private String candidate_skill_description;
-    private int benchPeriod;
+    private CandidateStatus candidateStatus;
+    private String benchCandidateSkills;
+    private String startDate;
+    private String endDate;
     //start-date and end-date
 
     // shouldn't this be mapped to userrole ??

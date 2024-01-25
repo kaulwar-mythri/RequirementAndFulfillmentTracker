@@ -35,9 +35,4 @@ public class UserRoleController {
     public ResponseEntity<String> deleteUserByEmployeeId(@PathVariable long employeeId) {
         return userRoleService.deleteUserByEmployeeId(employeeId);
     }
-
-    @PostMapping("/requestAccess")
-    public ResponseEntity<String> requestAccess(@RequestBody UserRoleDTO userRoleDTO) {
-        return userRoleService.requestAccess(userRoleDTO);
-    }
 }

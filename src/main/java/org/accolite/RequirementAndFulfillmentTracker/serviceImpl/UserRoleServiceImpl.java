@@ -42,10 +42,15 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public ResponseEntity<List<UserRoleDTO>> getAllUsers() {
-        checkIfAuthorized();
-        return ResponseEntity.ok(userRoleRepository.findAll().stream().map(userRole -> {
-            return entityToDTO.getUserRoleDTO(userRole);
-        }).toList());
+        Role user_role = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null).getRole();
+        if(user_role == Role.SUPER_ADMIN || user_role == Role.ADMIN || user_role == Role.BENCH_MANAGER) {
+            return ResponseEntity.ok(userRoleRepository.findAll().stream().map(userRole -> {
+                return entityToDTO.getUserRoleDTO(userRole);
+            }).toList());
+        } else {
+            throw new UserUnauthorisedException("User is not authorised to perform the above operation");
+        }
+
     }
 
     @Override

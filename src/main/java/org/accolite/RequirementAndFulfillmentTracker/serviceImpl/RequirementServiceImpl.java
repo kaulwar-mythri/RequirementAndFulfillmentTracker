@@ -178,18 +178,17 @@ public class RequirementServiceImpl implements RequirementService {
         return ResponseEntity.ok(entityToDTO.getRequirementDTO(requirement));
     }
 
+//    @Override
+//    public void deleteRequirement(Long id) {
+//        Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
+//        RequirementDTO requirementDTO = entityToDTO.getRequirementDTO(existingRequirement);
+//        checkIfAuthorized(requirementDTO.getAccount());
+//
+//        existingRequirement.setAccount(null);
+//        requirementsRepository.deleteById(id);
+//    }
+
     @Override
-    public void deleteRequirement(Long id) {
-        Requirement existingRequirement = requirementsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
-        RequirementDTO requirementDTO = entityToDTO.getRequirementDTO(existingRequirement);
-        checkIfAuthorized(requirementDTO.getAccount());
-
-        existingRequirement.setAccount(null);
-        requirementsRepository.deleteById(id);
-    }
-
-    @Override
-
     public void alertBench(Long benchManagerId, Set<Long> requirementIds) throws MessagingException {
         List<Requirement> requirements = requirementsRepository.findAllById(requirementIds);
         // using the given id , get the benchmanger's email id and pass it through

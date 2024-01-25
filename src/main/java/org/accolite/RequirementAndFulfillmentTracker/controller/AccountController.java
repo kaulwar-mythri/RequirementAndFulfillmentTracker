@@ -36,9 +36,9 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
-    // Delete Account by ID
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteAccountById(@PathVariable long id) {
-        return accountService.deleteAccountById(id);
-    }
+//    // Delete Account by ID
+//    @DeleteMapping("/{id}/delete")
+//    public ResponseEntity<String> deleteAccountById(@PathVariable long id) {
+//        return accountService.deleteAccountById(id);
+//    }
 }

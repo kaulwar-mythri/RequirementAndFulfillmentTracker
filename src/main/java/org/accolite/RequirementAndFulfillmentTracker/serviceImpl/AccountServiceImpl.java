@@ -63,12 +63,12 @@ public class AccountServiceImpl implements AccountService {
         }).toList());
     }
 
-    @Override
-    public ResponseEntity<String> deleteAccountById(long id) {
-        checkIfAuthorized();
-        accountRepository.deleteById(id);
-        return ResponseEntity.ok("Account deleted");
-    }
+//    @Override
+//    public ResponseEntity<String> deleteAccountById(long id) {
+//        checkIfAuthorized();
+//        accountRepository.deleteById(id);
+//        return ResponseEntity.ok("Account deleted");
+//    }
 
     private void checkIfAuthorized() {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser())
