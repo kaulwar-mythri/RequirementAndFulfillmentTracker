@@ -9,13 +9,10 @@ import java.util.List;
 public interface UserRoleService {
     public ResponseEntity<List<UserRoleDTO>> getAllUsers();
 
-    public ResponseEntity<UserRoleDTO> getUserById(long id);
+    public ResponseEntity<UserRoleDTO> getUserByEmployeeId(long employeeId);
 
     // Update User
-    public ResponseEntity<UserRoleDTO> updateUser(long id, UserRoleDTO updatedUserRole);
-    public ResponseEntity<String> deleteUserById(long id);
-
-    public ResponseEntity<String> requestAccess(UserRoleDTO userRoleDTO);
-
+    public ResponseEntity<UserRoleDTO> updateUser(long employeeId, UserRoleDTO updatedUserRole);
+    public ResponseEntity<String> deleteUserByEmployeeId(long employeeId);
     public ResponseEntity<String> getUser();
 }

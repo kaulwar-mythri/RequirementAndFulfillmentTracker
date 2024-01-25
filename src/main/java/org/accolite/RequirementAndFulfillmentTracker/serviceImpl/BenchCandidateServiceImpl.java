@@ -40,7 +40,7 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     List<Role> authorised_roles = new ArrayList<>(List.of(Role.REQUIREMENT_MANAGER, Role.BENCH_MANAGER, Role.ADMIN, Role.SUPER_ADMIN));
     @Override
     public ResponseEntity<BenchCandidateDTO> addCandidate(BenchCandidateDTO candidate) {
-        checkIfAuthorized();
+            checkIfAuthorized();
         // check if the candidate exists to avoid duplicate entries
 //        BenchCandidate existingCandidate = benchCandidateRepository.findById(candidate.getId()).orElse(null);
 //        if(existingCandidate == null) {

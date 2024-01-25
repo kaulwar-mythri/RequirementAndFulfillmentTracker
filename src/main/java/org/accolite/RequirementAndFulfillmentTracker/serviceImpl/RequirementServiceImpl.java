@@ -1,7 +1,6 @@
 package org.accolite.RequirementAndFulfillmentTracker.serviceImpl;
 
 import jakarta.mail.MessagingException;
-import jakarta.persistence.EntityNotFoundException;
 import org.accolite.RequirementAndFulfillmentTracker.config.JWTService;
 import org.accolite.RequirementAndFulfillmentTracker.entity.*;
 import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
@@ -23,7 +22,6 @@ import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -171,6 +169,13 @@ public class RequirementServiceImpl implements RequirementService {
             return false;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(requirementDTOS);
+    }
+
+    @Override
+    public ResponseEntity<RequirementDTO> getRequirementById(Long id) {
+        Requirement requirement = requirementsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Requirement not found with id: " + id));
+        return ResponseEntity.ok(entityToDTO.getRequirementDTO(requirement));
     }
 
     @Override

@@ -52,16 +52,14 @@ class UserRoleRepositoryTest {
     @Test
     public void saveUserRoles(){
         UserRole userRole = userRoleRepository.findByEmailId("raft.user.from@gmail.com").orElse(null);
+        Account account = Account.builder()
+                .name("Morgan Stanley")
+                .hierarchyTag(HierarchyTag.CLIENT)
+                .parentId(1)
+                .build();
 
-//        Account account = Account.builder()
-//                .name("GS")
-//                .hierarchyTag(HierarchyTag.DEPARTMENT)
-//                .parentId(2)
-//                .build();
-
-        Account account = accountRepository.findById(2L).orElseThrow(() -> new ResourceNotFoundException("Account not found"));;
-        System.out.println(accountRepository.findAll());
-        Set<Account> accountSet = new HashSet<>();
+        Set<Account> accountSet = userRole.getAccounts();
+        if(accountSet == null) accountSet = new HashSet<>();
         accountSet.add(account);
 
         userRole.setAccounts(accountSet);
