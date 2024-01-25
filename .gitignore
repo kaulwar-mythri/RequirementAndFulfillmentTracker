@@ -10,7 +10,7 @@ build/
 !**/src/test/**/build/
 
 # Gradle
-resources/application.properties
+
 # Ignore application.properties
 application.properties
 

@@ -46,6 +46,8 @@ public class RequirementController {
 //        return new ResponseEntity<>(requirements, HttpStatus.OK);
     }
 
+
+
     // Endpoint to get a requirement by ID
     // Endpoint to delete a requirement by ID
     // working
