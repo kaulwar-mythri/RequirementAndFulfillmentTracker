@@ -51,7 +51,8 @@ class UserRoleRepositoryTest {
 
     @Test
     public void saveUserRoles(){
-        UserRole userRole = userRoleRepository.findByEmailId("raft.user.from@gmail.com").orElse(null);
+        UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
+
         Account account = Account.builder()
                 .name("Morgan Stanley")
                 .hierarchyTag(HierarchyTag.CLIENT)

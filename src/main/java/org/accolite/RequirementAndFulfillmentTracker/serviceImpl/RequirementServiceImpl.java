@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
@@ -252,13 +253,14 @@ public class RequirementServiceImpl implements RequirementService {
     }
 
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
-        UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);
+        UserRole user = userRoleRepository.findByEmailId(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if(user.getRole() == Role.SUPER_ADMIN)
             return;
 
-        Set<Account> user_accounts = user.getAccounts().stream().map(accountDTO -> {
-            return accountRepository.findById(accountDTO.getAccount_id())
+        Set<Account> user_accounts = user.getAccounts().stream().map(account -> {
+            return accountRepository.findById(account.getAccount_id())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
         }).collect(Collectors.toSet());
 
