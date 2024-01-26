@@ -7,7 +7,6 @@ import org.accolite.RequirementAndFulfillmentTracker.entity.GoogleTokenPayload;
 import org.accolite.RequirementAndFulfillmentTracker.entity.Role;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
 import org.accolite.RequirementAndFulfillmentTracker.exception.ResourceNotFoundException;
-import org.accolite.RequirementAndFulfillmentTracker.exception.UserNotAuthenticatedException;
 import org.accolite.RequirementAndFulfillmentTracker.model.AccountDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
@@ -105,6 +104,5 @@ public class AuthServiceImpl implements AuthService {
         else
             return null;
     }
-
 
 }
