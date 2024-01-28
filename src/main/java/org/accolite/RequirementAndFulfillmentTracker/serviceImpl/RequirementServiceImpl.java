@@ -67,6 +67,7 @@ public class RequirementServiceImpl implements RequirementService {
         requirementIds.add(newRequirement.getRequirementId());
 
         alertHiring(1L, requirementIds);
+        alertBench(1L, requirementIds);
         return ResponseEntity.ok(entityToDTO.getRequirementDTO(newRequirement));
     }
 
