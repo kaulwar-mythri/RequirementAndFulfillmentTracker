@@ -13,5 +13,5 @@ public interface AccountService {
 
     public ResponseEntity<List<AccountDTO>> getAllAccounts();
 
-    public ResponseEntity<String> deleteAccountById(long id);
+//    public ResponseEntity<String> deleteAccountById(long id);
 }

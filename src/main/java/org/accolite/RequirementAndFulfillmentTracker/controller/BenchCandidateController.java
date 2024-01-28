@@ -42,8 +42,8 @@ public class BenchCandidateController {
 
     // working
 
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteCandidate(@PathVariable Long id) {
-        return benchCandidateService.deleteCandidate(id);
-    }
+//    @DeleteMapping("/{id}/delete")
+//    public ResponseEntity<String> deleteCandidate(@PathVariable Long id) {
+//        return benchCandidateService.deleteCandidate(id);
+//    }
 }

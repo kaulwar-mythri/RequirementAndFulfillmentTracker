@@ -49,8 +49,9 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
             BenchCandidate newCandidate = BenchCandidate.builder()
                     .candidateName(candidate.getCandidateName())
                     .benchManager(benchManager)
-                    .benchPeriod(candidate.getBenchPeriod())
-                    .status(candidate.getCandidateStatus())
+                    .startDate(candidate.getStartDate())
+                    .endDate(candidate.getEndDate())
+                    .candidateStatus(candidate.getCandidateStatus())
                     .build();
 
             newCandidate = benchCandidateRepository.save(newCandidate);
@@ -65,7 +66,7 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     @Override
     public List<BenchCandidateDTO> getAllCandidates() {
         List<BenchCandidate> benchCandidatesList = benchCandidateRepository.findAll().stream().filter(candidate -> {
-            return candidate.getStatus() != CandidateStatus.SELECTED;
+            return candidate.getCandidateStatus() != CandidateStatus.SELECTED;
         }).toList();
 
         return benchCandidatesList.stream().map(candidate -> entityToDTO.getBenchCandidateDTO(candidate)).collect(Collectors.toList());
@@ -80,9 +81,10 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
         UserRole benchManager = userRoleRepository.findById(updatedCandidate.getBenchManager().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench Manager not found"));
 
         existingCandidate.setCandidateName(updatedCandidate.getCandidateName());
-        existingCandidate.setStatus(updatedCandidate.getCandidateStatus());
+        existingCandidate.setCandidateStatus(updatedCandidate.getCandidateStatus());
 //        existingCandidate.setSkills(updatedCandidate.getSkills());
-        existingCandidate.setBenchPeriod(updatedCandidate.getBenchPeriod());
+        existingCandidate.setStartDate(updatedCandidate.getStartDate());
+        existingCandidate.setEndDate(updatedCandidate.getEndDate());
         existingCandidate.setBenchManager(benchManager);
 
         existingCandidate = benchCandidateRepository.save(existingCandidate);
@@ -91,29 +93,17 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
         return ResponseEntity.ok(benchCandidateDTO);
     }
 
-    @Override
-    public ResponseEntity<String> deleteCandidate(Long id) {
-
-        BenchCandidate candidate = benchCandidateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
-        BenchCandidateDTO benchCandidateDTO = entityToDTO.getBenchCandidateDTO(candidate);
-        checkIfAuthorized();
-        candidate.setBenchManager(null);
-        benchCandidateRepository.deleteById(id);
-
-        return ResponseEntity.ok("Successfully deleted bench candidate");
-    }
-
-    private Set<AccountDTO> convertAccountsToDTOs(Set<Account> accounts) {
-        return accounts.stream().map(account -> {
-            AccountDTO accountDTO = AccountDTO.builder()
-                    .account_id(account.getAccount_id())
-                    .name(account.getName())
-                    .hierarchyTag(account.getHierarchyTag())
-                    .parentId(account.getParentId())
-                    .build();
-            return accountDTO;
-        }).collect(Collectors.toSet());
-    }
+//    @Override
+//    public ResponseEntity<String> deleteCandidate(Long id) {
+//
+//        BenchCandidate candidate = benchCandidateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Requirement with id" + id + "not found"));
+//        BenchCandidateDTO benchCandidateDTO = entityToDTO.getBenchCandidateDTO(candidate);
+//        checkIfAuthorized();
+//        candidate.setBenchManager(null);
+//        benchCandidateRepository.deleteById(id);
+//
+//        return ResponseEntity.ok("Successfully deleted bench candidate");
+//    }
 
     private void checkIfAuthorized() {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);

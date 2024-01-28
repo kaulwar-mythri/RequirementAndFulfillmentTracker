@@ -41,7 +41,7 @@ public class FulfillmentServiceImpl implements FulfillmentService {
     public ResponseEntity<FulfillmentDTO> createFulfillment(FulfillmentDTO fulfillment) {
         Submission submission = submissionRepository.findById(fulfillment.getSubmission().getSubmissionId()).orElseThrow(() -> new ResourceNotFoundException("Submission with given id is not found"));
         BenchCandidate benchCandidate = benchCandidateRepository.findById(entityToDTO.getSubmissionDTO(submission).getBenchCandidate().getId()).orElseThrow(() -> new ResourceNotFoundException("Bench Candidate with given id is not found"));
-        if(benchCandidate.getStatus() == CandidateStatus.SELECTED) throw new ResourceNotFoundException("Bench Candidate was already selected by another account");
+        if(benchCandidate.getCandidateStatus() == CandidateStatus.SELECTED) throw new ResourceNotFoundException("Bench Candidate was already selected by another account");
 
         Fulfillment newFulfillment = Fulfillment.builder()
                 .fulfillmentDate(fulfillment.getFulfillmentDate())
@@ -51,7 +51,7 @@ public class FulfillmentServiceImpl implements FulfillmentService {
         newFulfillment = fulfillmentRepository.save(newFulfillment);
 
         submission.setSubmissionStatus(SubmissionStatus.ACCEPTED);
-        benchCandidate.setStatus(CandidateStatus.SELECTED);
+        benchCandidate.setCandidateStatus(CandidateStatus.SELECTED);
         updateRequirement(entityToDTO.getSubmissionDTO(submission));
         return ResponseEntity.ok(entityToDTO.getFulfillmentDTO(newFulfillment));
 
@@ -113,10 +113,10 @@ public class FulfillmentServiceImpl implements FulfillmentService {
         return ResponseEntity.ok(entityToDTO.getFulfillmentDTO(existingFulfillment));
     }
 
-    @Override
-    public void deleteFulfillment(Long fulfillmentId) {
-        fulfillmentRepository.deleteById(fulfillmentId);
-    }
+//    @Override
+//    public void deleteFulfillment(Long fulfillmentId) {
+//        fulfillmentRepository.deleteById(fulfillmentId);
+//    }
 
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
         UserRole user = userRoleRepository.findByEmailId(jwtService.getUser()).orElse(null);

@@ -51,12 +51,12 @@ public class RequirementController {
     // Endpoint to get a requirement by ID
     // Endpoint to delete a requirement by ID
     // working
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteRequirement(@PathVariable("id") Long id) {
-        requirementService.deleteRequirement(id);
-
-        return ResponseEntity.ok("Deleted requirement successfully");
-    }
+//    @DeleteMapping("/{id}/delete")
+//    public ResponseEntity<String> deleteRequirement(@PathVariable("id") Long id) {
+//        requirementService.deleteRequirement(id);
+//
+//        return ResponseEntity.ok("Deleted requirement successfully");
+//    }
 
     // Endpoint to alert bench for a bench manager
     @PostMapping("/alertBench")
