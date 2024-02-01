@@ -1,7 +1,9 @@
 package org.accolite.RequirementAndFulfillmentTracker.controller;
 
 import org.accolite.RequirementAndFulfillmentTracker.entity.Account;
+import org.accolite.RequirementAndFulfillmentTracker.entity.GoogleTokenPayload;
 import org.accolite.RequirementAndFulfillmentTracker.entity.UserRole;
+import org.accolite.RequirementAndFulfillmentTracker.model.FirebasePayloadDTO;
 import org.accolite.RequirementAndFulfillmentTracker.model.UserRoleDTO;
 import org.accolite.RequirementAndFulfillmentTracker.repository.UserRoleRepository;
 import org.accolite.RequirementAndFulfillmentTracker.service.AuthService;
@@ -28,5 +30,12 @@ public class AuthController {
     public ResponseEntity<UserRoleDTO> getUser() {
         return authService.getUser();
     }
+
+    @PostMapping("/signInWithGoogle")
+    public ResponseEntity<Map<String, Object>> signInWithGoogle(@RequestBody FirebasePayloadDTO firebasePayload) {
+        System.out.println(firebasePayload.getName() + firebasePayload.getEmailId());
+        return authService.signInWithGoogle(firebasePayload.getName(), firebasePayload.getEmailId());
+    }
+
 }
 

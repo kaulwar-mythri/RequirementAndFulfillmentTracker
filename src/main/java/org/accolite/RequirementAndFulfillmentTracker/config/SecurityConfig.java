@@ -30,7 +30,7 @@ public class SecurityConfig{
 //                .cors(cors -> cors.disable())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                    req.requestMatchers( "/api/auth/createUser", "/swagger-ui/**", "/api-docs/**")
+                    req.requestMatchers( "/**", "/api/auth/createUser", "/swagger-ui/**", "/api-docs/**")
 
                                 .permitAll()
                                 .anyRequest()

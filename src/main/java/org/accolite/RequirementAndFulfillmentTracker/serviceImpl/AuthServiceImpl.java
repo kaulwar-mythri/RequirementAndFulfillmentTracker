@@ -65,6 +65,31 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public ResponseEntity<Map<String, Object>> signInWithGoogle(String name, String emailId) {
+        String jwtToken;
+        UserRole userRole = userRoleRepository.findByEmailId(emailId).orElse(null);
+
+        if(userRole == null) {
+            var newUserRole = UserRole.builder()
+                    .name(name)
+                    .emailId(emailId)
+                    .role(Role.DEFAULT)
+                    .accounts(new HashSet<>())
+                    .build();
+            userRole = userRoleRepository.save(newUserRole);
+            jwtToken = jwtService.generateJWTToken(userRole);
+        } else {
+            jwtToken = jwtService.generateJWTToken(userRole);
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("status", "success");
+        responseMap.put("authToken", jwtToken);
+        responseMap.put("userRole", userRole.getRole());
+        return ResponseEntity.ok(responseMap);
+    }
+
+    @Override
     public ResponseEntity<UserRoleDTO> getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserRole userRole = userRoleRepository.findByEmailId(authentication.getName())

@@ -20,9 +20,9 @@ class AccountRepositoryTest {
     @Test
     public void addAccount() {
         Account account = Account.builder()
-                .name("Fidelity")
-                .hierarchyTag(HierarchyTag.CLIENT)
-                .parentId(1)
+                .name("BFS")
+                .hierarchyTag(HierarchyTag.BUSINESS_UNIT)
+                .parentId(0)
                 .build();
 
         accountRepository.save(account);

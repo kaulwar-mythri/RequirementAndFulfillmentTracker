@@ -41,6 +41,7 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
     @Override
     public ResponseEntity<BenchCandidateDTO> addCandidate(BenchCandidateDTO candidate) {
             checkIfAuthorized();
+        System.out.println(candidate);
         // check if the candidate exists to avoid duplicate entries
 //        BenchCandidate existingCandidate = benchCandidateRepository.findById(candidate.getId()).orElse(null);
 //        if(existingCandidate == null) {
@@ -52,6 +53,7 @@ public class BenchCandidateServiceImpl implements BenchCandidateService {
                     .startDate(candidate.getStartDate())
                     .endDate(candidate.getEndDate())
                     .candidateStatus(candidate.getCandidateStatus())
+                    .benchCandidateSkills(candidate.getBenchCandidateSkills())
                     .build();
 
             newCandidate = benchCandidateRepository.save(newCandidate);

@@ -54,7 +54,7 @@ class UserRoleRepositoryTest {
         UserRole userRole = userRoleRepository.findByEmailId("kaulwar.mythri@accolitedigital.com").orElse(null);
 
         Account account = Account.builder()
-                .name("Morgan Stanley")
+                .name("Goldmann Sachs")
                 .hierarchyTag(HierarchyTag.CLIENT)
                 .parentId(1)
                 .build();
