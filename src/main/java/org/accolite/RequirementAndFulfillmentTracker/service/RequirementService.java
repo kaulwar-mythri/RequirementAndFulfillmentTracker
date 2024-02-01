@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface RequirementService {
 
-    ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement);
+    ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement) throws MessagingException;
     ResponseEntity<RequirementDTO> updateRequirement(Long id, RequirementDTO updatedRequirement);
     ResponseEntity<List<RequirementDTO>> getAllRequirements();
 
@@ -19,7 +19,7 @@ public interface RequirementService {
 
 //    void deleteRequirement(Long id);
     void alertBench(Long benchManagerId, Set<Long> requirementIds) throws MessagingException;
-    void alertHiring(Long hiringManagerId, Set<Long> requirementIds);
+    void alertHiring(Long hiringManagerId, Set<Long> requirementIds) throws MessagingException;
 
 
 
