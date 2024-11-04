@@ -25,7 +25,7 @@ public class RequirementController {
     private EmailNotificationService emailNotificationService;
 
     @PostMapping("/create")
-    public ResponseEntity<RequirementDTO> createRequirement(@RequestBody RequirementDTO requirement) {
+    public ResponseEntity<RequirementDTO> createRequirement(@RequestBody RequirementDTO requirement) throws MessagingException {
         return requirementService.createRequirement(requirement);
     }
 
@@ -46,6 +46,8 @@ public class RequirementController {
 //        return new ResponseEntity<>(requirements, HttpStatus.OK);
     }
 
+
+
     // Endpoint to get a requirement by ID
     // Endpoint to delete a requirement by ID
     // working
@@ -65,7 +67,7 @@ public class RequirementController {
 
     // Endpoint to alert hiring for a hiring manager
     @PostMapping("/alertHiring")
-    public ResponseEntity<Void> alertHiring(@RequestParam Long hiringManagerId, @RequestBody Set<Long> requirementIds) {
+    public ResponseEntity<Void> alertHiring(@RequestParam Long hiringManagerId, @RequestBody Set<Long> requirementIds) throws MessagingException {
         requirementService.alertHiring(hiringManagerId, requirementIds);
         return new ResponseEntity<>(HttpStatus.OK);
     }

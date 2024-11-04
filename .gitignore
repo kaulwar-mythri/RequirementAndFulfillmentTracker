@@ -5,6 +5,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Gradle
+
+# Ignore application.properties
+application.properties
+
+# Ignore build.gradle
+build.gradle
+
 ### STS ###
 .apt_generated
 .classpath

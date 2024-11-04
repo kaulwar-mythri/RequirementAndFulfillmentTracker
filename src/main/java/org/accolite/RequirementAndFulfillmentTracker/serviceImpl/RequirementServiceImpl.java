@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.accolite.RequirementAndFulfillmentTracker.utils.EntityToDTO;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public class RequirementServiceImpl implements RequirementService {
     List<Role> authorised_roles = new ArrayList<>(List.of(Role.REQUIREMENT_MANAGER, Role.ADMIN, Role.SUPER_ADMIN));
 
     @Override
-    public ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement) {
+    public ResponseEntity<RequirementDTO> createRequirement(RequirementDTO requirement) throws MessagingException {
         checkIfAuthorized(requirement.getAccount());
         Account account = accountRepository.findById(requirement.getAccount().getAccount_id()).orElse(null);
         Requirement newRequirement = Requirement.builder()
@@ -62,6 +63,11 @@ public class RequirementServiceImpl implements RequirementService {
 //                .skillSet(requirement.getSkillSet())
                 .build();
         newRequirement = requirementsRepository.save(newRequirement);
+        Set<Long> requirementIds = new HashSet<>();
+        requirementIds.add(newRequirement.getRequirementId());
+
+        alertHiring(1L, requirementIds);
+        alertBench(1L, requirementIds);
         return ResponseEntity.ok(entityToDTO.getRequirementDTO(newRequirement));
     }
 
@@ -235,6 +241,7 @@ public class RequirementServiceImpl implements RequirementService {
                     .append("<td>").append(requirement.getRequiredNo()).append("</td>")
                     .append("<td>").append(requirement.getJob_description()).append("</td>")
                     .append("<td>").append(requirement.getHiring_manager()).append("</td>")
+                    .append("<td>").append(requirement.getAccount().getName()).append("</td>")
                     .append("</tr>");
         }
 
@@ -247,9 +254,24 @@ public class RequirementServiceImpl implements RequirementService {
     }
 
     @Override
-    public void alertHiring(Long hiringManagerId, Set<Long> requirementIds) {
+    public void alertHiring(Long hiringManagerId, Set<Long> requirementIds) throws MessagingException {
         // Implement alertHiring logic based on your requirements
         // You can perform actions like notifying the hiring manager or updating the database
+        List<Requirement> requirements = requirementsRepository.findAllById(requirementIds);
+        // using the given id , get the benchmanger's email id and pass it through
+
+//        UserRole benchManager = userRoleRepository.findById(benchManagerId).orElse(null);
+//        if(benchManager == null) {
+//            System.out.println("bench manager doesn't exist");
+//            return;
+//        }
+//        String benchManagerEmail =benchManager.getEmailId();
+        // we will have to set username and apppassword of the respective benchmanager in application.properties
+        // this needs to be implemented, tested and reviewed
+        if (!requirements.isEmpty()) {
+            String tableContent = generateRequirementTable(requirements);
+            emailNotificationService.sendNotification("raftspringto@gmail.com", "Requirements Obtained", tableContent);
+        }
     }
 
     private void checkIfAuthorized(AccountDTO requirement_accountDTO) {
